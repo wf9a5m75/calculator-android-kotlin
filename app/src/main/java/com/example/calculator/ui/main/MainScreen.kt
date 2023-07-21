@@ -1,4 +1,4 @@
-package com.example.calculator.ui.screens
+package com.example.calculator.ui.main
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Row
@@ -30,13 +30,16 @@ import com.example.calculator.ui.components.SpecialInputButton
 import com.example.calculator.ui.theme.CalculatorTheme
 
 @Composable
-fun MainScreen() {
+fun MainScreen(
+    viewModel: MainScreenViewModel? = null
+) {
     val buttonSpace = integerResource(id = R.integer.button_space_dp).toFloat()
     val buttonSpaceDp = Dp(buttonSpace)
     val screenWidth = LocalConfiguration.current.screenWidthDp
-    val screenHeight = LocalConfiguration.current.screenHeightDp
 
-    val buttonSize = (screenWidth - buttonSpace * 5) / 4
+    val numOfButtonsInRow = integerResource(id = R.integer.number_of_buttons_in_row)
+    val numOfSpaces = numOfButtonsInRow + 1
+    val buttonSize = (screenWidth - buttonSpace * numOfSpaces) / numOfButtonsInRow
     val buttonSizeDp = Dp(buttonSize)
     val buttonFontSp = 30.sp
 
@@ -46,7 +49,8 @@ fun MainScreen() {
             .fillMaxSize()
             .padding(buttonSpaceDp),
     ) {
-        val (display,
+        val (
+            display,
             row1,
             row2,
             row3,
@@ -76,24 +80,36 @@ fun MainScreen() {
                     .width(buttonSizeDp),
                 fontSize = buttonFontSp,
                 value = ButtonValue("AC", ValueKind.ALL_CLEAR),
+                onClick = {
+                    viewModel?.onActionButtonClick(it)
+                },
             )
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             OperatorButton(
                 modifier = Modifier.width(buttonSizeDp),
                 fontSize = buttonFontSp,
                 value = ButtonValue("()", ValueKind.PARENTHESES),
+                onClick = {
+                    viewModel?.onSpecialButtonClick(it)
+                },
             )
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             OperatorButton(
                 modifier = Modifier.width(buttonSizeDp),
                 fontSize = buttonFontSp,
                 value = ButtonValue("%", ValueKind.PERCENT),
+                onClick = {
+                    viewModel?.onSpecialButtonClick(it)
+                },
             )
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             OperatorButton(
                 modifier = Modifier.width(buttonSizeDp),
                 fontSize = buttonFontSp,
                 value = ButtonValue("/", ValueKind.DIVIDE),
+                onClick = {
+                    viewModel?.onOperatorButtonClick(it)
+                },
             )
         }
         Row(
@@ -108,24 +124,36 @@ fun MainScreen() {
                 modifier = Modifier.width(buttonSizeDp),
                 fontSize = buttonFontSp,
                 value = ButtonValue(7, ValueKind.NUMBER),
+                onClick = {
+                    viewModel?.onNumberButtonClick(it)
+                },
             )
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             NumberInputButton(
                 modifier = Modifier.width(buttonSizeDp),
                 fontSize = buttonFontSp,
                 value = ButtonValue(8, ValueKind.NUMBER),
+                onClick = {
+                    viewModel?.onNumberButtonClick(it)
+                },
             )
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             NumberInputButton(
                 modifier = Modifier.width(buttonSizeDp),
                 fontSize = buttonFontSp,
                 value = ButtonValue(9, ValueKind.NUMBER),
+                onClick = {
+                    viewModel?.onNumberButtonClick(it)
+                },
             )
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             OperatorButton(
                 modifier = Modifier.width(buttonSizeDp),
                 fontSize = buttonFontSp,
                 value = ButtonValue("X", ValueKind.MULTIPLY),
+                onClick = {
+                    viewModel?.onOperatorButtonClick(it)
+                },
             )
         }
         Row(
@@ -140,24 +168,36 @@ fun MainScreen() {
                 modifier = Modifier.width(buttonSizeDp),
                 fontSize = buttonFontSp,
                 value = ButtonValue(4, ValueKind.NUMBER),
+                onClick = {
+                    viewModel?.onNumberButtonClick(it)
+                },
             )
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             NumberInputButton(
                 modifier = Modifier.width(buttonSizeDp),
                 fontSize = buttonFontSp,
                 value = ButtonValue(5, ValueKind.NUMBER),
+                onClick = {
+                    viewModel?.onNumberButtonClick(it)
+                },
             )
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             NumberInputButton(
                 modifier = Modifier.width(buttonSizeDp),
                 fontSize = buttonFontSp,
                 value = ButtonValue(6, ValueKind.NUMBER),
+                onClick = {
+                    viewModel?.onNumberButtonClick(it)
+                },
             )
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             OperatorButton(
                 modifier = Modifier.width(buttonSizeDp),
                 fontSize = buttonFontSp,
                 value = ButtonValue("-", ValueKind.SUBTRACT),
+                onClick = {
+                    viewModel?.onOperatorButtonClick(it)
+                },
             )
         }
         Row(
@@ -172,24 +212,36 @@ fun MainScreen() {
                 modifier = Modifier.width(buttonSizeDp),
                 fontSize = buttonFontSp,
                 value = ButtonValue(1, ValueKind.NUMBER),
+                onClick = {
+                    viewModel?.onNumberButtonClick(it)
+                },
             )
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             NumberInputButton(
                 modifier = Modifier.width(buttonSizeDp),
                 fontSize = buttonFontSp,
                 value = ButtonValue(2, ValueKind.NUMBER),
+                onClick = {
+                    viewModel?.onNumberButtonClick(it)
+                },
             )
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             NumberInputButton(
                 modifier = Modifier.width(buttonSizeDp),
                 fontSize = buttonFontSp,
                 value = ButtonValue(3, ValueKind.NUMBER),
+                onClick = {
+                    viewModel?.onNumberButtonClick(it)
+                },
             )
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             OperatorButton(
                 modifier = Modifier.width(buttonSizeDp),
                 fontSize = buttonFontSp,
                 value = ButtonValue("+", ValueKind.ADD),
+                onClick = {
+                    viewModel?.onOperatorButtonClick(it)
+                },
             )
         }
 
@@ -204,24 +256,36 @@ fun MainScreen() {
                 modifier = Modifier.width(buttonSizeDp),
                 fontSize = buttonFontSp,
                 value = ButtonValue(0, ValueKind.NUMBER),
+                onClick = {
+                    viewModel?.onNumberButtonClick(it)
+                },
             )
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             SpecialInputButton(
                 modifier = Modifier.width(buttonSizeDp),
                 fontSize = buttonFontSp,
                 value = ButtonValue(".", ValueKind.DOT),
+                onClick = {
+                    viewModel?.onSpecialButtonClick(it)
+                },
             )
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             SpecialInputButton(
                 fontSize = buttonFontSp,
                 modifier = Modifier.width(buttonSizeDp),
                 value = ButtonValue("DEL", ValueKind.DELETE),
+                onClick = {
+                    viewModel?.onSpecialButtonClick(it)
+                },
             )
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             ActionButton(
                 modifier = Modifier.width(buttonSizeDp),
                 fontSize = buttonFontSp,
                 value = ButtonValue("=", ValueKind.DO_CALCULATE),
+                onClick = {
+                    viewModel?.onActionButtonClick(it)
+                },
             )
         }
     }

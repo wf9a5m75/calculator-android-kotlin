@@ -51,6 +51,7 @@ fun NumberInputButton(
     value: ButtonValue<Int>,
     fontSize: TextUnit,
     modifier: Modifier = Modifier,
+    onClick: (value: ButtonValue<Int>) -> Unit
 ) {
     CircleButton(
         modifier = modifier,
@@ -58,7 +59,8 @@ fun NumberInputButton(
         colors = CircleButtonColors(
             background = MaterialTheme.colorScheme.secondary,
             content = MaterialTheme.colorScheme.onSecondary,
-        )
+        ),
+        onClick = onClick,
     ) {
         Text(
             fontSize = fontSize,
@@ -72,6 +74,7 @@ fun SpecialInputButton(
     value: ButtonValue<String>,
     fontSize: TextUnit,
     modifier: Modifier = Modifier,
+    onClick: (value: ButtonValue<String>) -> Unit
 ) {
     CircleButton(
         modifier = modifier,
@@ -79,7 +82,8 @@ fun SpecialInputButton(
         colors = CircleButtonColors(
             background = MaterialTheme.colorScheme.secondary,
             content = MaterialTheme.colorScheme.onSecondary,
-        )
+        ),
+        onClick = onClick,
     ) {
         Text(
             fontSize = fontSize,
@@ -93,6 +97,7 @@ fun OperatorButton(
     value: ButtonValue<String>,
     fontSize: TextUnit,
     modifier: Modifier = Modifier,
+    onClick: (value: ButtonValue<String>) -> Unit
 ) {
     CircleButton(
         modifier = modifier,
@@ -100,7 +105,8 @@ fun OperatorButton(
         colors = CircleButtonColors(
             background = MaterialTheme.colorScheme.primary,
             content = MaterialTheme.colorScheme.onPrimary,
-        )
+        ),
+        onClick = onClick,
     ) {
         Text(
             fontSize = fontSize,
@@ -114,6 +120,7 @@ fun ActionButton(
     value: ButtonValue<String>,
     fontSize: TextUnit,
     modifier: Modifier = Modifier,
+    onClick: (value: ButtonValue<String>) -> Unit
 ) {
     CircleButton(
         modifier = modifier,
@@ -121,7 +128,8 @@ fun ActionButton(
         colors = CircleButtonColors(
             background = MaterialTheme.colorScheme.tertiary,
             content = MaterialTheme.colorScheme.onTertiary,
-        )
+        ),
+        onClick = onClick,
     ) {
         Text(
             fontSize = fontSize,
