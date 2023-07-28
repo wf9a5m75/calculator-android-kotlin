@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import com.example.calculator.model.ButtonValue
+import com.example.calculator.model.ValueModel
 
 class CircleButtonColors(
     val background: Color,
@@ -48,10 +48,10 @@ fun <T> CircleButton(
 
 @Composable
 fun NumberInputButton(
-    value: ButtonValue<Int>,
+    value: ValueModel<Int>,
     fontSize: TextUnit,
     modifier: Modifier = Modifier,
-    onClick: (value: ButtonValue<Int>) -> Unit
+    onClick: (value: ValueModel<Int>) -> Unit
 ) {
     CircleButton(
         modifier = modifier,
@@ -71,10 +71,10 @@ fun NumberInputButton(
 
 @Composable
 fun SpecialInputButton(
-    value: ButtonValue<String>,
+    value: ValueModel<String>,
     fontSize: TextUnit,
     modifier: Modifier = Modifier,
-    onClick: (value: ButtonValue<String>) -> Unit
+    onClick: (value: ValueModel<String>) -> Unit
 ) {
     CircleButton(
         modifier = modifier,
@@ -94,10 +94,10 @@ fun SpecialInputButton(
 
 @Composable
 fun OperatorButton(
-    value: ButtonValue<String>,
+    value: ValueModel<String>,
     fontSize: TextUnit,
     modifier: Modifier = Modifier,
-    onClick: (value: ButtonValue<String>) -> Unit
+    onClick: (value: ValueModel<String>) -> Unit
 ) {
     CircleButton(
         modifier = modifier,
@@ -117,10 +117,10 @@ fun OperatorButton(
 
 @Composable
 fun ActionButton(
-    value: ButtonValue<String>,
+    value: ValueModel<String>,
     fontSize: TextUnit,
     modifier: Modifier = Modifier,
-    onClick: (value: ButtonValue<String>) -> Unit
+    onClick: (value: ValueModel<String>) -> Unit
 ) {
     CircleButton(
         modifier = modifier,

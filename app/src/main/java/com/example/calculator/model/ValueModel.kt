@@ -14,8 +14,8 @@ enum class ValueKind {
     DOT,
 }
 
-data class ButtonValue<T>(
-    val value: T,
+data class ValueModel<T>(
+    var value: T,
     val kind: ValueKind,
 )
 
