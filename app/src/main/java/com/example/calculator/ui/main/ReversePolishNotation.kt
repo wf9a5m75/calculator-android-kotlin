@@ -58,6 +58,9 @@ class ReversePolishNotation {
         } catch (e: RpnError) {
             ansNumber = 0.0
             answer.value = "Error"
+        } catch (e: ZeroDivideError) {
+            ansNumber = 0.0
+            answer.value = "ZeroDivideError"
         }
     }
 
