@@ -3,6 +3,7 @@ package com.example.calculator.ui.main
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import com.example.calculator.errors.RpnError
+import com.example.calculator.errors.ZeroDivideError
 import com.example.calculator.model.ValueKind
 import com.example.calculator.model.ValueModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -12,7 +13,6 @@ import java.util.Stack
 data class InputToken(
     val value: ValueModel<*>,
     val containsDot: Boolean,
-    var next: InputToken? = null,
 )
 
 
@@ -22,18 +22,17 @@ class ReversePolishNotation {
 
     val formula = mutableStateOf("")
     val answer = mutableStateOf("")
-    private var ansNumber = 0
+    private var ansNumber = 0.0
 
     fun isEmpty() = this.inputs.isEmpty()
 
 
     fun removeLast() {
-//        if (this.isEmpty()) {
-//            return
-//        }
-//
-//        val removed = stack.removeLast()
-//        stack.peek().next = null
+        if (this.isEmpty()) {
+            return
+        }
+
+        inputs.removeLast()
     }
 
     fun clear() {
@@ -45,7 +44,7 @@ class ReversePolishNotation {
         if (inputs.isEmpty()) {
             formula.value = ""
             answer.value = "0"
-            ansNumber = 0
+            ansNumber = 0.0
             return
         }
         val buffer = StringBuffer()
@@ -53,24 +52,98 @@ class ReversePolishNotation {
             buffer.append(input.value)
         }
         formula.value = buffer.toString()
-        calculate()
-//        try {
-//            ansNumber = calculate()
-//            answer.value = ansNumber.toString()
-//        } catch (e: RpnError) {
-//            ansNumber = 0
-//            answer.value = "Error"
-//        }
+        try {
+            ansNumber = calculate()
+            answer.value = ansNumber.toString()
+        } catch (e: RpnError) {
+            ansNumber = 0.0
+            answer.value = "Error"
+        }
     }
 
-    private fun calculate() {
+    private fun calculate(): Double {
         val tokens = toTokens(inputs)
-        val results = toRPN(tokens)
+        val rpnTokens = toRPN(tokens)
+//        Log.d("RPN", "=======================")
+        debugOutput(rpnTokens)
+
+        val rpnStack = Stack<InputToken>()
+        while (!rpnTokens.isEmpty()) {
+//            debugOutput(rpnStack)
+            val token = rpnTokens.removeAt(0)
+            when (token.value.kind) {
+                ValueKind.NUMBER -> {
+                    rpnStack.push(token)
+                }
+
+                ValueKind.ADD,
+                ValueKind.MULTIPLY,
+                ValueKind.DIVIDE,
+                ValueKind.SUBTRACT -> {
+                    val rightHandValue = rpnStack.pop()
+                    val leftHandValue = rpnStack.pop()
+                    val value = doOperation(
+                        leftHandValue = leftHandValue.value.value as Double,
+                        rightHandValue = rightHandValue.value.value as Double,
+                        operation = token.value.kind,
+                    )
+                    rpnStack.push(
+                        InputToken(
+                            value = ValueModel(
+                                value = value,
+                                kind = ValueKind.NUMBER,
+                            ),
+                            containsDot = (value % 10.0 != 0.0)
+                        )
+                    )
+                }
+
+                else -> {
+                    throw RpnError("Unexpected token")
+                }
+            }
+        }
+//        debugOutput(rpnStack)
+        val result = rpnStack.pop()
+        return result.value.value as Double
+    }
+    private fun debugOutput(results: Stack<InputToken>) {
+
         val buffer = StringBuffer()
         for (result in results) {
             buffer.append(result.value.value.toString())
         }
-        answer.value = buffer.toString()
+        Log.d("RPN", "  -> stack = " + buffer.toString());
+    }
+    private fun debugOutput(results: ArrayList<InputToken>) {
+
+        val buffer = StringBuffer()
+        for (result in results) {
+            buffer.append(result.value.value.toString())
+        }
+        Log.d("RPN", "----> buffer = " + buffer.toString());
+    }
+
+    private fun doOperation(leftHandValue: Double, rightHandValue: Double, operation: ValueKind) : Double {
+        return when(operation) {
+            ValueKind.ADD -> leftHandValue + rightHandValue
+
+            ValueKind.SUBTRACT -> leftHandValue - rightHandValue
+
+            ValueKind.DIVIDE -> {
+                if (rightHandValue == 0.0) {
+                    throw ZeroDivideError()
+                }
+
+                leftHandValue / rightHandValue
+            }
+
+            ValueKind.MULTIPLY -> leftHandValue * rightHandValue
+
+            else -> {
+                throw RpnError("Unexpected operation")
+            }
+        }
     }
 
     private fun toRPN(inputs: ArrayList<InputToken>): ArrayList<InputToken> {
@@ -87,13 +160,15 @@ class ReversePolishNotation {
                 ValueKind.SUBTRACT,
                 ValueKind.DIVIDE,
                 ValueKind.MULTIPLY -> {
-                    if (operators.isEmpty() ||
-                        getPriority(operators.peek().value) <= getPriority(token.value)) {
-                        operators.push(token)
-                        continue
-                    }
-                    while (!operators.isEmpty()) {
-                        result.add(operators.pop())
+                    if (!operators.isEmpty()) {
+                        while (true) {
+                            if ((!operators.isEmpty()) &&
+                                (getPriority(operators.peek().value) >= getPriority(token.value))) {
+                                result.add(operators.pop())
+                            } else {
+                                break
+                            }
+                        }
                     }
                     operators.push(token)
                 }
@@ -118,7 +193,6 @@ class ReversePolishNotation {
                 ValueKind.NUMBER -> {
                     val num = (input.value as Int).toDouble()
                     token = token * 10 + num
-                    Log.d("RPN", "--->token =${token}")
                 }
 
 
