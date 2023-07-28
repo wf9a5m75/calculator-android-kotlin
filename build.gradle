@@ -1,6 +1,9 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     ext {
+        androidX_core_version = '1.10.1'
+        androidX_lifecycle_version = '2.6.1'
+        androidX_activity_version = '1.7.2'
         androidX_fragment_version = '1.6.0'
         compose_navigation_version = '2.6.0'
         constraintlayout_version = '2.2.0-alpha10'
