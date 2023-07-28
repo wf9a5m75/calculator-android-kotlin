@@ -4,18 +4,15 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.calculator.errors.CalculatorError
 import com.example.calculator.errors.MainScreenError
-import com.example.calculator.model.ValueModel
+import com.example.calculator.errors.RpnError
 import com.example.calculator.model.ValueKind
+import com.example.calculator.model.ValueModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.Stack
 import javax.inject.Inject
 
 @HiltViewModel
@@ -27,11 +24,17 @@ class MainScreenViewModel @Inject constructor() : ViewModel() {
     var dispatcher: CoroutineDispatcher = Dispatchers.IO
     private val rpn = ReversePolishNotation()
 
-    val formula: State<String>
-        get() = rpn.formula
+    private var inputs = ArrayList<ValueModel<*>>()
+    val formula = mutableStateOf("")
+
+    fun isEmpty() = this.inputs.isEmpty()
+
+    private var ansNumber = 0.0
+
+    private val internalAnswer = mutableStateOf("")
 
     val answer: State<String>
-        get() = rpn.answer
+        get() = internalAnswer
 
     /**
      * 数字キーが押された
@@ -42,13 +45,36 @@ class MainScreenViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    private suspend fun internalOnNumberButtonClick(button: ValueModel<Int>) = withContext(dispatcher) {
-        if (button.kind != ValueKind.NUMBER) {
-            throw MainScreenError("Invalid input value")
+    private suspend fun internalOnNumberButtonClick(button: ValueModel<Int>) =
+        withContext(dispatcher) {
+            if (button.kind != ValueKind.NUMBER) {
+                throw MainScreenError("Invalid input value")
+            }
+
+            append(button)
+            rpn.update()
         }
 
-        rpn.append(button)
-        rpn.update()
+    private fun append(value: ValueModel<*>) {
+        when (value.kind) {
+            ValueKind.NUMBER -> {
+                inputs.add(value)
+            }
+
+            ValueKind.ADD, ValueKind.SUBTRACT,
+            ValueKind.DIVIDE, ValueKind.MULTIPLY -> {
+                if (isEmpty()) {
+                    return
+                }
+                val last = inputs.last()
+                if (last.kind != ValueKind.NUMBER) {
+                    removeLast()
+                }
+                inputs.add(value)
+            }
+            else -> {}
+        }
+
     }
 
     fun onOperatorButtonClick(button: ValueModel<String>) {
@@ -57,11 +83,11 @@ class MainScreenViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    private suspend fun internalOnOperatorButtonClick(button: ValueModel<String>) = withContext(dispatcher) {
-        rpn.append(button)
-        rpn.update()
-    }
-
+    private suspend fun internalOnOperatorButtonClick(button: ValueModel<String>) =
+        withContext(dispatcher) {
+            append(button)
+            rpn.update()
+        }
 
     fun onSpecialButtonClick(button: ValueModel<String>) {
         viewModelScope.launch {
@@ -69,20 +95,33 @@ class MainScreenViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    private suspend fun internalOnSpecialButtonClick(button: ValueModel<String>) = withContext(dispatcher) {
+    private suspend fun internalOnSpecialButtonClick(button: ValueModel<String>) =
+        withContext(dispatcher) {
 
-        when(button.kind) {
-            ValueKind.DELETE -> {
-                if (rpn.isEmpty()) {
-                    rpn.clear()
-                    return@withContext
+            when (button.kind) {
+                ValueKind.DELETE -> {
+                    if (isEmpty()) {
+                        clear()
+                        return@withContext
+                    }
+                    removeLast()
+                    updateCalculate()
                 }
-                rpn.removeLast()
-                rpn.update()
-            }
 
-            else -> {}
+                else -> {}
+            }
         }
+    private fun removeLast() {
+        if (this.isEmpty()) {
+            return
+        }
+        inputs.removeLast()
+        updateCalculate()
+    }
+    
+    private fun clear() {
+        inputs.clear()
+        updateCalculate()
     }
 
     fun onActionButtonClick(button: ValueModel<String>) {
@@ -90,25 +129,43 @@ class MainScreenViewModel @Inject constructor() : ViewModel() {
             internalOnActionButtonClick(button)
         }
     }
-    private suspend fun internalOnActionButtonClick(button: ValueModel<String>) = withContext(dispatcher) {
-        when(button.kind) {
-            ValueKind.ALL_CLEAR -> {
-                rpn.clear()
-            }
 
-            ValueKind.DO_CALCULATE -> {
+    private suspend fun internalOnActionButtonClick(button: ValueModel<String>) =
+        withContext(dispatcher) {
+            when (button.kind) {
+                ValueKind.ALL_CLEAR -> clear()
 
-                // 現在の答えを次の式の初期値とする
-            }
+                ValueKind.DO_CALCULATE -> {
 
-            else -> {
-                throw MainScreenError("Unexpected value")
+                    // 現在の答えを次の式の初期値とする
+                }
+
+                else -> {
+                    throw MainScreenError("Unexpected value")
+                }
             }
         }
-    }
 
-    private fun updateCalculate(): Int {
-        return 0
+    private fun updateCalculate() {
+        if (inputs.isEmpty()) {
+            formula.value = ""
+            internalAnswer.value = "0"
+            ansNumber = 0.0
+            return
+        }
+        val buffer = StringBuffer()
+        for (input in inputs) {
+            buffer.append(input.value)
+        }
+        formula.value = buffer.toString()
+
+        try {
+            ansNumber = rpn.calculate(buffer.toString())
+            internalAnswer.value = ansNumber.toString()
+        } catch (e: RpnError) {
+            ansNumber = 0.0
+            internalAnswer.value = "Error"
+        }
     }
 
 }

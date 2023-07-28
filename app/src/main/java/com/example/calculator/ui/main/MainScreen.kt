@@ -60,7 +60,7 @@ fun MainScreen(
         ) = createRefs()
 
         Display(
-            formulaFontSize = 60.sp,
+            formulaFontSize = 40.sp,
             answerFontSize = 30.sp,
             modifier = Modifier.constrainAs(display) {
                 top.linkTo(parent.top, margin = buttonSpaceDp)
@@ -154,7 +154,7 @@ fun MainScreen(
             OperatorButton(
                 modifier = Modifier.width(buttonSizeDp),
                 fontSize = buttonFontSp,
-                value = ValueModel("X", ValueKind.MULTIPLY),
+                value = ValueModel("×", ValueKind.MULTIPLY),
                 onClick = {
                     viewModel?.onOperatorButtonClick(it)
                 },
