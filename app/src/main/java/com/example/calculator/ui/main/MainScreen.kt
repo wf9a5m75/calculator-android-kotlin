@@ -265,14 +265,15 @@ fun MainScreen(
                 },
             )
             Spacer(modifier = Modifier.width(buttonSpaceDp))
-            SpecialInputButton(
-                modifier = Modifier.width(buttonSizeDp),
-                fontSize = buttonFontSp,
-                value = ValueModel(".", ValueKind.DOT),
-                onClick = {
-                    viewModel?.onSpecialButtonClick(it)
-                },
-            )
+            Spacer(modifier = Modifier.width(buttonSizeDp))
+//            SpecialInputButton(
+//                modifier = Modifier.width(buttonSizeDp),
+//                fontSize = buttonFontSp,
+//                value = ValueModel(".", ValueKind.DOT),
+//                onClick = {
+//                    viewModel?.onSpecialButtonClick(it)
+//                },
+//            )
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             SpecialInputButton(
                 fontSize = buttonFontSp,
