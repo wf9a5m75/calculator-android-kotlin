@@ -1,13 +1,11 @@
 package com.example.calculator.ui.main
 
 import android.util.Log
-import androidx.compose.runtime.mutableStateOf
 import com.example.calculator.errors.RpnError
 import com.example.calculator.errors.ZeroDivideError
 import com.example.calculator.model.ValueKind
 import com.example.calculator.model.ValueModel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import java.util.Stack
 
 data class InputToken(
@@ -15,17 +13,28 @@ data class InputToken(
     val containsDot: Boolean,
 )
 
+private enum class OperatorPriority(val value: Int) {
+    FIRST(1),
+    SECOND(2),
+    THIRD(3),
+    FOURTH(4),
+    FIFTH(5);
+
+    companion object  {
+        fun fromInt(value: Int) = OperatorPriority.values().first { it.value == value }
+    }
+
+}
 
 class ReversePolishNotation {
 
     private var inputs = ArrayList<ValueModel<*>>()
 
-    val formula = mutableStateOf("")
-    val answer = mutableStateOf("")
+    val expression = MutableStateFlow("")
+    val result = MutableStateFlow("")
     private var ansNumber = 0.0
 
     fun isEmpty() = this.inputs.isEmpty()
-
 
     fun removeLast() {
         if (this.isEmpty()) {
@@ -42,8 +51,8 @@ class ReversePolishNotation {
 
     fun update() {
         if (inputs.isEmpty()) {
-            formula.value = ""
-            answer.value = "0"
+            expression.value = ""
+            result.value = "0"
             ansNumber = 0.0
             return
         }
@@ -51,16 +60,16 @@ class ReversePolishNotation {
         for (input in inputs) {
             buffer.append(input.value)
         }
-        formula.value = buffer.toString()
+        expression.value = buffer.toString()
         try {
             ansNumber = calculate()
-            answer.value = ansNumber.toString()
+            result.value = ansNumber.toString()
         } catch (e: RpnError) {
             ansNumber = 0.0
-            answer.value = "Error"
+            result.value = "Error"
         } catch (e: ZeroDivideError) {
             ansNumber = 0.0
-            answer.value = "ZeroDivideError"
+            result.value = "ZeroDivideError"
         }
     }
 
@@ -116,7 +125,7 @@ class ReversePolishNotation {
         for (result in results) {
             buffer.append(result.value.value.toString())
         }
-        Log.d("RPN", "  -> stack = " + buffer.toString());
+        Log.d("RPN", "  -> stack = " + buffer.toString())
     }
     private fun debugOutput(results: ArrayList<InputToken>) {
 
@@ -124,7 +133,7 @@ class ReversePolishNotation {
         for (result in results) {
             buffer.append(result.value.value.toString())
         }
-        Log.d("RPN", "----> buffer = " + buffer.toString());
+        Log.d("RPN", "----> buffer = " + buffer.toString())
     }
 
     private fun doOperation(leftHandValue: Double, rightHandValue: Double, operation: ValueKind) : Double {
@@ -166,7 +175,7 @@ class ReversePolishNotation {
                     if (!operators.isEmpty()) {
                         while (true) {
                             if ((!operators.isEmpty()) &&
-                                (getPriority(operators.peek().value) >= getPriority(token.value))) {
+                                (getOperatorPriority(operators.peek().value) >= getOperatorPriority(token.value))) {
                                 result.add(operators.pop())
                             } else {
                                 break
@@ -230,29 +239,29 @@ class ReversePolishNotation {
         return result
     }
 
-    fun append(value: ValueModel<*>) {
-        when (value.kind) {
-            ValueKind.NUMBER -> {
-                inputs.add(value)
-            }
+//    fun append(value: ValueModel<*>) {
+//        when (value.kind) {
+//            ValueKind.NUMBER -> {
+//                inputs.add(value)
+//            }
+//
+//            ValueKind.ADD, ValueKind.SUBTRACT,
+//                ValueKind.DIVIDE, ValueKind.MULTIPLY -> {
+//                    if (isEmpty()) {
+//                        return
+//                    }
+//                    val last = inputs.last()
+//                    if (last.kind != ValueKind.NUMBER) {
+//                        inputs.removeLast()
+//                    }
+//                    inputs.add(value)
+//                }
+//            else -> {}
+//        }
+//
+//    }
 
-            ValueKind.ADD, ValueKind.SUBTRACT,
-                ValueKind.DIVIDE, ValueKind.MULTIPLY -> {
-                    if (isEmpty()) {
-                        return
-                    }
-                    val last = inputs.last()
-                    if (last.kind != ValueKind.NUMBER) {
-                        inputs.removeLast()
-                    }
-                    inputs.add(value)
-                }
-            else -> {}
-        }
-
-    }
-
-    private fun getPriority(value: ValueModel<*>): Int {
+    private fun getOperatorPriority(value: ValueModel<*>): Int {
         return when (value.kind) {
             ValueKind.MULTIPLY -> 2
             ValueKind.DIVIDE -> 2

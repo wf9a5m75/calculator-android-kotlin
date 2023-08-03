@@ -8,10 +8,10 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SdkSuppress
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
-import androidx.test.uiautomator.UiObject2
 import androidx.test.uiautomator.UiSelector
 import androidx.test.uiautomator.Until
-import org.hamcrest.CoreMatchers.notNullValue
+import com.example.calculator.ui.components.EXPRESSION_TEST_TAG
+import com.example.calculator.ui.components.RESULT_TEST_TAG
 
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -30,7 +30,7 @@ private const val CALC_APP = "com.example.calculator"
 
 @RunWith(AndroidJUnit4::class)
 @SdkSuppress(minSdkVersion = 24)
-class ExampleInstrumentedTest {
+class InstrumentedTestUsingUIAutomator {
 
     private lateinit var device: UiDevice
 
@@ -87,19 +87,11 @@ class ExampleInstrumentedTest {
 //        device.findObject(uiSelector.resourceId("equals")).click()
 
         // Verify the result = 7.0
-        val formulaRow = device.findObject(uiSelector.resourceId("formula_display"))
+        val formulaRow = device.findObject(uiSelector.resourceId(EXPRESSION_TEST_TAG))
         assertEquals("1+2×3", formulaRow.text)
 
-        val answerRow = device.findObject(uiSelector.resourceId("answer_display"))
+        val answerRow = device.findObject(uiSelector.resourceId(RESULT_TEST_TAG))
         assertEquals("7.0", answerRow.text)
     }
 
-
-
-//    @Test
-//    fun useAppContext() {
-//        // Context of the app under test.
-//        val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-//        assertEquals("com.example.calculator", appContext.packageName)
-//    }
 }

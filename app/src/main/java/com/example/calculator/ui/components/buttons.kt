@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import com.example.calculator.model.KeyEventValue
 import com.example.calculator.model.ValueModel
 
 class CircleButtonColors(
@@ -48,10 +49,10 @@ fun <T> CircleButton(
 
 @Composable
 fun NumberInputButton(
-    value: ValueModel<Int>,
+    value: KeyEventValue,
     fontSize: TextUnit,
     modifier: Modifier = Modifier,
-    onClick: (value: ValueModel<Int>) -> Unit
+    onClick: (value: KeyEventValue) -> Unit
 ) {
     CircleButton(
         modifier = modifier,
@@ -64,17 +65,17 @@ fun NumberInputButton(
     ) {
         Text(
             fontSize = fontSize,
-            text = value.value.toString()
+            text = value.label
         )
     }
 }
 
 @Composable
 fun SpecialInputButton(
-    value: ValueModel<String>,
+    value: KeyEventValue,
     fontSize: TextUnit,
     modifier: Modifier = Modifier,
-    onClick: (value: ValueModel<String>) -> Unit
+    onClick: (value: KeyEventValue) -> Unit
 ) {
     CircleButton(
         modifier = modifier,
@@ -87,17 +88,17 @@ fun SpecialInputButton(
     ) {
         Text(
             fontSize = fontSize,
-            text = value.value,
+            text = value.label,
         )
     }
 }
 
 @Composable
 fun OperatorButton(
-    value: ValueModel<String>,
+    value: KeyEventValue,
     fontSize: TextUnit,
     modifier: Modifier = Modifier,
-    onClick: (value: ValueModel<String>) -> Unit
+    onClick: (value: KeyEventValue) -> Unit
 ) {
     CircleButton(
         modifier = modifier,
@@ -110,17 +111,17 @@ fun OperatorButton(
     ) {
         Text(
             fontSize = fontSize,
-            text = value.value,
+            text = value.label,
         )
     }
 }
 
 @Composable
 fun ActionButton(
-    value: ValueModel<String>,
+    value: KeyEventValue,
     fontSize: TextUnit,
     modifier: Modifier = Modifier,
-    onClick: (value: ValueModel<String>) -> Unit
+    onClick: (value: KeyEventValue) -> Unit
 ) {
     CircleButton(
         modifier = modifier,
@@ -133,7 +134,7 @@ fun ActionButton(
     ) {
         Text(
             fontSize = fontSize,
-            text = value.value,
+            text = value.label,
         )
     }
 }

@@ -9,7 +9,7 @@ enum class ValueKind {
     MULTIPLY,
     SUBTRACT,
     ADD,
-    DO_CALCULATE,
+    EQUALS,
     DELETE,
     DOT,
 }
@@ -18,9 +18,3 @@ data class ValueModel<T>(
     var value: T,
     val kind: ValueKind,
 )
-
-// https://proandroiddev.com/using-previewparameters-and-providing-composables-to-jetpack-compose-previews-5b1f5a8fe192
-//fun interface NumberButton {
-////    @Composable
-//    fun config(): ButtonConfig<ButtonValue<Int>>
-//}
