@@ -58,7 +58,7 @@ fun NumberPad(
             ActionButton(
                 modifier = Modifier
                     .width(buttonSizeDp)
-                    .testTag("all_clear")
+                    .testTag(NumpadButton.ALL_CLEAR.testTag)
                 ,
                 fontSize = buttonFontSp,
                 value = NumpadButton.ALL_CLEAR,
@@ -68,7 +68,7 @@ fun NumberPad(
             OperatorButton(
                 modifier = Modifier
                     .width(buttonSizeDp)
-                    .testTag("left_bracket"),
+                    .testTag(NumpadButton.LEFT_BRACKET.testTag),
                 fontSize = buttonFontSp,
                 value = NumpadButton.LEFT_BRACKET,
                 onClick = onButtonClick,
@@ -77,7 +77,7 @@ fun NumberPad(
             OperatorButton(
                 modifier = Modifier
                     .width(buttonSizeDp)
-                    .testTag("right_bracket"),
+                    .testTag(NumpadButton.RIGHT_BRACKET.testTag),
                 fontSize = buttonFontSp,
                 value = NumpadButton.RIGHT_BRACKET,
                 onClick = onButtonClick,
@@ -86,7 +86,7 @@ fun NumberPad(
             OperatorButton(
                 modifier = Modifier
                     .width(buttonSizeDp)
-                    .testTag("divides"),
+                    .testTag(NumpadButton.DIVIDE.testTag),
                 fontSize = buttonFontSp,
                 value = NumpadButton.DIVIDE,
                 onClick = onButtonClick,
@@ -103,7 +103,7 @@ fun NumberPad(
         ) {
             NumberInputButton(
                 modifier = Modifier
-                    .testTag("seven")
+                    .testTag(NumpadButton.SEVEN.testTag)
                     .width(buttonSizeDp),
                 fontSize = buttonFontSp,
                 value = NumpadButton.SEVEN,
@@ -112,7 +112,7 @@ fun NumberPad(
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             NumberInputButton(
                 modifier = Modifier
-                    .testTag("eight")
+                    .testTag(NumpadButton.EIGHT.testTag)
                     .width(buttonSizeDp),
                 fontSize = buttonFontSp,
                 value = NumpadButton.EIGHT,
@@ -121,7 +121,7 @@ fun NumberPad(
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             NumberInputButton(
                 modifier = Modifier
-                    .testTag("nine")
+                    .testTag(NumpadButton.NINE.testTag)
                     .width(buttonSizeDp),
                 fontSize = buttonFontSp,
                 value = NumpadButton.NINE,
@@ -130,7 +130,7 @@ fun NumberPad(
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             OperatorButton(
                 modifier = Modifier
-                    .testTag("multiplies")
+                    .testTag(NumpadButton.MULTIPLY.testTag)
                     .width(buttonSizeDp),
                 fontSize = buttonFontSp,
                 value = NumpadButton.MULTIPLY,
@@ -148,7 +148,7 @@ fun NumberPad(
         ) {
             NumberInputButton(
                 modifier = Modifier
-                    .testTag("four")
+                    .testTag(NumpadButton.FOUR.testTag)
                     .width(buttonSizeDp),
                 fontSize = buttonFontSp,
                 value = NumpadButton.FOUR,
@@ -157,7 +157,7 @@ fun NumberPad(
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             NumberInputButton(
                 modifier = Modifier
-                    .testTag("five")
+                    .testTag(NumpadButton.FIVE.testTag)
                     .width(buttonSizeDp),
                 fontSize = buttonFontSp,
                 value = NumpadButton.FIVE,
@@ -166,7 +166,7 @@ fun NumberPad(
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             NumberInputButton(
                 modifier = Modifier
-                    .testTag("six")
+                    .testTag(NumpadButton.SIX.testTag)
                     .width(buttonSizeDp),
                 fontSize = buttonFontSp,
                 value = NumpadButton.SIX,
@@ -175,7 +175,7 @@ fun NumberPad(
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             OperatorButton(
                 modifier = Modifier
-                    .testTag("subtracts")
+                    .testTag(NumpadButton.SUBTRACT.testTag)
                     .width(buttonSizeDp),
                 fontSize = buttonFontSp,
                 value = NumpadButton.SUBTRACT,
@@ -193,7 +193,7 @@ fun NumberPad(
         ) {
             NumberInputButton(
                 modifier = Modifier
-                    .testTag("one")
+                    .testTag(NumpadButton.ONE.testTag)
                     .width(buttonSizeDp),
                 fontSize = buttonFontSp,
                 value = NumpadButton.ONE,
@@ -202,7 +202,7 @@ fun NumberPad(
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             NumberInputButton(
                 modifier = Modifier
-                    .testTag("two")
+                    .testTag(NumpadButton.TWO.testTag)
                     .width(buttonSizeDp),
                 fontSize = buttonFontSp,
                 value = NumpadButton.TWO,
@@ -211,7 +211,7 @@ fun NumberPad(
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             NumberInputButton(
                 modifier = Modifier
-                    .testTag("three")
+                    .testTag(NumpadButton.THREE.testTag)
                     .width(buttonSizeDp),
                 fontSize = buttonFontSp,
                 value = NumpadButton.THREE,
@@ -220,7 +220,7 @@ fun NumberPad(
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             OperatorButton(
                 modifier = Modifier
-                    .testTag("adds")
+                    .testTag(NumpadButton.ADD.testTag)
                     .width(buttonSizeDp),
                 fontSize = buttonFontSp,
                 value = NumpadButton.ADD,
@@ -238,7 +238,7 @@ fun NumberPad(
         ) {
             NumberInputButton(
                 modifier = Modifier
-                    .testTag("zero")
+                    .testTag(NumpadButton.ZERO.testTag)
                     .width(buttonSizeDp),
                 fontSize = buttonFontSp,
                 value = NumpadButton.ZERO,
@@ -247,7 +247,7 @@ fun NumberPad(
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             SpecialInputButton(
                 modifier = Modifier
-                    .testTag("dot")
+                    .testTag(NumpadButton.DOT.testTag)
                     .width(buttonSizeDp),
                 fontSize = buttonFontSp,
                 value = NumpadButton.DOT,
@@ -257,7 +257,7 @@ fun NumberPad(
             SpecialInputButton(
                 fontSize = buttonFontSp,
                 modifier = Modifier
-                    .testTag("deletes")
+                    .testTag(NumpadButton.DELETE.testTag)
                     .width(buttonSizeDp),
                 value = NumpadButton.DELETE,
                 onClick = onButtonClick,
@@ -265,7 +265,7 @@ fun NumberPad(
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             ActionButton(
                 modifier = Modifier
-                    .testTag("equals")
+                    .testTag(NumpadButton.EQUAL.testTag)
                     .width(buttonSizeDp),
                 fontSize = buttonFontSp,
                 value = NumpadButton.EQUAL,
