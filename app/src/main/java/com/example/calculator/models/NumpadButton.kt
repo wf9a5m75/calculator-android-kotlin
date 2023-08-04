@@ -10,7 +10,7 @@ enum class NumpadButton(
 ) {
     ALL_CLEAR(
         label = "AC",
-        keyCode = KeyEvent.KEYCODE_C,
+        keyCode = KeyEvent.KEYCODE_ESCAPE,
     ),
     LEFT_BRACKET(
         label = com.example.rpn.Operator.LEFT_BRACKET.symbol,
