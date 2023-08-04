@@ -124,8 +124,7 @@ fun MainScreen(
             buttonFontSp = buttonFontSp,
             buttonSpaceDp = buttonSpaceDp,
             onButtonClick = {
-
-//                simulateKeyPress(context, it.keyCode)
+                simulateKeyPress(context, it.keyCode)
             },
         )
     }
