@@ -64,4 +64,14 @@ class RpnNormalizeTest {
         val result = rpnNormalize("2.5 * (3 + 4) / 2 - (1.5 + 2)")
         assertEquals("2.5*(3+4)/2-(1.5+2)", result)
     }
+    @Test
+    fun `2_32+1_2÷`() {
+        val result = rpnNormalize("2.32+1.2/")
+        assertEquals("2.32+1.2", result)
+    }
+    @Test
+    fun `2_32+1_2÷+-`() {
+        val result = rpnNormalize("2.32+1.2/+-")
+        assertEquals("2.32+1.2", result)
+    }
 }

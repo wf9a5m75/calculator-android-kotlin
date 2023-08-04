@@ -1,15 +1,18 @@
 package com.example.rpn
 
-fun rpnNormalize(input: String): String {
+fun rpnNormalize(
+    input: String,
+    allowTailingSymbols: Boolean = false,
+): String {
     var prevChar: Char = '0'
     var hasDot = false
-    return (input.toCharArray())
-        .filter {
-            when(it) {
-                '0', '1', '2', '3', '4', '5', '6', '7','8', '9', '(', ')'-> {
+    val result = (input.toCharArray()).filter {
+            when (it) {
+                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '(', ')' -> {
                     prevChar = it
                     true
                 }
+
                 '+', '-', '*', '/' -> {
                     val result = when {
                         prevChar.isDigit() -> true
@@ -18,7 +21,7 @@ fun rpnNormalize(input: String): String {
 
                         // i.e. 12*-12, 12/+12
                         (prevChar == '*' || prevChar == '/' || prevChar == '(') &&
-                                (it == '+' || it == '-') -> true
+                            (it == '+' || it == '-') -> true
 
                         // i.e. 12.1+-92
                         prevChar == '+' && it == '-' -> true
@@ -31,16 +34,23 @@ fun rpnNormalize(input: String): String {
                     hasDot = false
                     result
                 }
+
                 '.' -> {
                     val result = !hasDot
                     hasDot = true
                     result
                 }
+
                 else -> false
             }
         }
         .joinToString("")
         .replace("()", "")
         .replace("..", ".")
-        .replace(Regex("^[*/]"), "")
+    if (allowTailingSymbols) {
+        return result
+    }
+    return result
+        .replace(Regex("^[*/]*"), "")
+        .replace(Regex("[*/+-]*$"), "")
 }
