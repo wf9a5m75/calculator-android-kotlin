@@ -15,6 +15,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.key
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.semantics
@@ -83,8 +85,24 @@ fun MainScreen(
                 top.linkTo(parent.top, margin = buttonSpaceDp)
                 bottom.linkTo(numberPad.top, margin = buttonSpaceDp)
             },
-            viewModel = viewModel,
             focusRequester = focusRequester,
+            answerValue = viewModel.result,
+            expressionValue = viewModel.expression,
+            onKeyEvent = {
+                when (it.key) {
+                    Key.Enter -> {
+                        viewModel.calculate()
+                        true
+                    }
+
+                    Key.C -> {
+                        viewModel.clear()
+                        true
+                    }
+
+                    else -> false
+                }
+            }
         )
 
         NumberPad(

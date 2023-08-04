@@ -1,6 +1,7 @@
 package com.example.calculator.ui.components
 
 
+import android.view.KeyEvent
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Text
@@ -72,20 +73,23 @@ private fun characterFilter(input: String): String {
         .joinToString("")
         .replace("()", "")
         .replace("..", ".")
-        .replace(Regex("^[*/]"), "")
+//        .replace(Regex("^[*/]"), "")
 }
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun Display(
     modifier: Modifier = Modifier
         .fillMaxWidth(),
-    viewModel: IMainScreenViewModel,
     formulaFontSize: TextUnit = 30.sp,
     answerFontSize: TextUnit = 30.sp,
     focusRequester: FocusRequester,
+    answerValue: StateFlow<String>,
+    expressionValue: MutableStateFlow<String>,
+    onKeyEvent: (key: androidx.compose.ui.input.key.KeyEvent) -> Boolean,
 ) {
 
-    val answerTextProp = viewModel.result.collectAsState()
+    val answerTextProp = answerValue.collectAsState()
+    val expressionProp = expressionValue.collectAsState()
 
     ConstraintLayout(
         modifier = modifier
@@ -100,9 +104,9 @@ fun Display(
           LocalTextInputService provides null
         ) {
             BasicTextField(
-                value = viewModel.expression.collectAsState().value,
+                value = expressionProp.value,
                 onValueChange = {
-                    viewModel.expression.value = characterFilter(it)
+                    expressionValue.value = characterFilter(it)
                 },
                 modifier = Modifier
                     .focusRequester(focusRequester)
@@ -113,18 +117,7 @@ fun Display(
                     }
                     .testTag(EXPRESSION_TEST_TAG)
                     .onKeyEvent {
-                        return@onKeyEvent when (it.key) {
-                            Key.Enter -> {
-                                viewModel.calculate()
-                                true
-                            }
-                            Key.C -> {
-                                viewModel.clear()
-                                true
-                            }
-                            else -> false
-                        }
-
+                        return@onKeyEvent onKeyEvent(it)
                     }
                 ,
                 textStyle = TextStyle(
@@ -154,21 +147,9 @@ fun Display(
 @Composable
 private fun DisplayPreview() {
     Display(
-        viewModel = object : IMainScreenViewModel {
-            override var dispatcher: CoroutineDispatcher = Dispatchers.IO
-            override val expression: MutableStateFlow<String>
-                get() = MutableStateFlow("1+2")
-            override val result: StateFlow<String>
-                get() = MutableStateFlow("3.0")
-
-            override fun calculate() {
-                // Do nothing here
-            }
-
-            override fun clear() {
-                // Do nothing here
-            }
-        },
-        focusRequester = FocusRequester()
+        focusRequester = FocusRequester(),
+        answerValue = MutableStateFlow("1+2"),
+        expressionValue = MutableStateFlow("3"),
+        onKeyEvent = { false },
     )
 }

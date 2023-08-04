@@ -38,7 +38,7 @@ enum class NumpadButton(
     ),
     DELETE(
         label = "DEL",
-        keyCode = KeyEvent.KEYCODE_BACK,
+        keyCode = KeyEvent.KEYCODE_DEL,
     ),
     EQUAL(
         label = "=",
