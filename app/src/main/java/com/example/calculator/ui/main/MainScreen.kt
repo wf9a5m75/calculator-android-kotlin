@@ -95,10 +95,11 @@ fun MainScreen(
                         true
                     }
 
-                    Key.C -> {
+                    Key.C, Key.Escape, Key.Clear -> {
                         viewModel.clear()
                         true
                     }
+
 
                     else -> false
                 }

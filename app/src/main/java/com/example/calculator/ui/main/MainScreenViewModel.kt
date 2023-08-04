@@ -3,7 +3,8 @@ package com.example.calculator.ui.main
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.calculator.errors.CalculatorError
+import com.example.rpn.CalculatorError
+import com.example.rpn.rpnCalculate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -47,11 +48,11 @@ class MainScreenViewModel @Inject constructor() : ViewModel(), IMainScreenViewMo
         expression: String,
     ) = withContext(dispatcher) {
         try {
-            val result = ReversePolishNotation.calculate(
-                expression = expression
+            val result = com.example.rpn.rpnCalculate(
+                expression = expression,
             )
             internalResult.value = result
-        } catch (e: CalculatorError) {
+        } catch (e: com.example.rpn.CalculatorError) {
             internalResult.value = e.toString()
         }
     }

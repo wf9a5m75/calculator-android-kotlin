@@ -52,6 +52,7 @@ android {
 }
 
 dependencies {
+    implementation project(':rpn')
 
     implementation "androidx.core:core-ktx:$androidX_core_version"
     implementation platform('org.jetbrains.kotlin:kotlin-bom:1.8.0')

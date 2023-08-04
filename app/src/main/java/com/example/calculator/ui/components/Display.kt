@@ -1,7 +1,5 @@
 package com.example.calculator.ui.components
 
-
-import android.view.KeyEvent
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Text
@@ -12,8 +10,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.platform.testTag
@@ -25,49 +21,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import com.example.calculator.ui.main.IMainScreenViewModel
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
+import com.example.rpn.rpnNormalize
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import java.lang.Integer.min
 
 const val EXPRESSION_TEST_TAG = "expression"
 const val RESULT_TEST_TAG = "result"
 
-
-private fun isOperator(c: Char): Boolean {
-    return "+-*/".contains(c)
-}
-private fun characterFilter(input: String): String {
-    var prevChar: Char = '!'
-    var hasDot = false
-    return (input.toCharArray())
-        .filter {
-            when(it) {
-                '0', '1', '2', '3', '4', '5', '6', '7','8', '9', '(', ')'-> {
-                    prevChar = it
-                    true
-                }
-                '+', '-', '*', '/' -> {
-                    val result = isOperator(prevChar) != isOperator(it)
-                    prevChar = it
-                    hasDot = false
-                    result
-                }
-                '.' -> {
-                    val result = !hasDot
-                    hasDot = true
-                    result
-                }
-                else -> false
-            }
-        }
-        .joinToString("")
-        .replace("()", "")
-        .replace("..", ".")
-        .replace(Regex("^[*/]"), "")
-}
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun Display(
@@ -99,7 +59,7 @@ fun Display(
             BasicTextField(
                 value = expressionProp.value,
                 onValueChange = {
-                    expressionValue.value = characterFilter(it)
+                    expressionValue.value = rpnNormalize(it)
                 },
                 modifier = Modifier
                     .focusRequester(focusRequester)

@@ -1,6 +1,5 @@
 package com.example.calculator.ui.components
 
-import android.view.KeyEvent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
@@ -15,7 +14,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import com.example.calculator.models.NumpadButton
-import com.example.calculator.ui.main.Operator
 
 class CircleButtonColors(
     val background: Color,

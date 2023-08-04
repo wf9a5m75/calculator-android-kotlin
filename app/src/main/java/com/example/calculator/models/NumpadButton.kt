@@ -1,7 +1,7 @@
 package com.example.calculator.models
 
 import android.view.KeyEvent
-import com.example.calculator.ui.main.Operator
+import com.example.rpn.Operator
 
 
 enum class NumpadButton(
@@ -13,27 +13,27 @@ enum class NumpadButton(
         keyCode = KeyEvent.KEYCODE_C,
     ),
     LEFT_BRACKET(
-        label = Operator.LEFT_BRACKET.symbol,
+        label = com.example.rpn.Operator.LEFT_BRACKET.symbol,
         keyCode = KeyEvent.KEYCODE_LEFT_BRACKET,
     ),
     RIGHT_BRACKET(
-        label = Operator.RIGHT_BRACKET.symbol,
+        label = com.example.rpn.Operator.RIGHT_BRACKET.symbol,
         keyCode = KeyEvent.KEYCODE_RIGHT_BRACKET,
     ),
     ADD(
-        label = Operator.ADD.symbol,
+        label = com.example.rpn.Operator.ADD.symbol,
         keyCode = KeyEvent.KEYCODE_PLUS,
     ),
     SUBTRACT(
-        label = Operator.SUBTRACT.symbol,
+        label = com.example.rpn.Operator.SUBTRACT.symbol,
         keyCode = KeyEvent.KEYCODE_MINUS,
     ),
     MULTIPLY(
-        label = Operator.MULTIPLY.symbol,
+        label = com.example.rpn.Operator.MULTIPLY.symbol,
         keyCode = KeyEvent.KEYCODE_STAR,
     ),
     DIVIDE(
-        label = Operator.DIVIDE.symbol,
+        label = com.example.rpn.Operator.DIVIDE.symbol,
         keyCode = KeyEvent.KEYCODE_SLASH,
     ),
     DELETE(
