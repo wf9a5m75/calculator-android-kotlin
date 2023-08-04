@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
@@ -59,7 +60,7 @@ fun Display(
             BasicTextField(
                 value = expressionProp.value,
                 onValueChange = {
-                    expressionValue.value = rpnNormalize(it)
+                    expressionValue.value = rpnNormalize(it, true)
                 },
                 modifier = Modifier
                     .focusRequester(focusRequester)
