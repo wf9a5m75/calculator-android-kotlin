@@ -50,11 +50,7 @@ class MainScreenViewModel @Inject constructor() : ViewModel(), IMainScreenViewMo
             val result = ReversePolishNotation.calculate(
                 expression = expression
             )
-            if (result % 1 == 0.0) {
-                internalResult.value = result.toInt().toString()
-            } else {
-                internalResult.value = result.toString()
-            }
+            internalResult.value = result
         } catch (e: CalculatorError) {
             internalResult.value = e.toString()
         }

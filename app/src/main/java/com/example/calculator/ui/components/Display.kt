@@ -41,31 +41,24 @@ private fun isOperator(c: Char): Boolean {
 }
 private fun characterFilter(input: String): String {
     var prevChar: Char = '!'
-    var brackets = 0
+    var hasDot = false
     return (input.toCharArray())
         .filter {
             when(it) {
-                '0', '1', '2', '3', '4', '5', '6', '7','8', '9'-> {
+                '0', '1', '2', '3', '4', '5', '6', '7','8', '9', '(', ')'-> {
                     prevChar = it
                     true
                 }
                 '+', '-', '*', '/' -> {
                     val result = isOperator(prevChar) != isOperator(it)
                     prevChar = it
+                    hasDot = false
                     result
                 }
                 '.' -> {
-                    val result = prevChar != it
-                    prevChar = it
+                    val result = !hasDot
+                    hasDot = true
                     result
-                }
-                '(' -> {
-                    brackets += 1
-                    true
-                }
-                ')' -> {
-                    brackets = min(brackets - 1, 0)
-                    brackets > 0
                 }
                 else -> false
             }
@@ -73,7 +66,7 @@ private fun characterFilter(input: String): String {
         .joinToString("")
         .replace("()", "")
         .replace("..", ".")
-//        .replace(Regex("^[*/]"), "")
+        .replace(Regex("^[*/]"), "")
 }
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable

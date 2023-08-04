@@ -4,9 +4,9 @@ import android.util.Log
 import com.example.calculator.errors.RpnError
 import com.example.calculator.errors.SyntaxError
 import com.example.calculator.errors.ZeroDivideError
+import java.math.BigDecimal
 import java.util.Stack
 import kotlin.math.abs
-import kotlin.math.pow
 
 private const val ASC_CODE_0 = 0x30
 
@@ -21,34 +21,47 @@ private enum class RpnKind {
 
 private data class OperatorToken(
     val value: Operator,
-): RpnToken(
+) : RpnToken(
     kind = RpnKind.OPERATOR,
 )
 
 private data class NumberToken(
-    val value: Double,
+    val value: BigDecimal,
     val containsDot: Boolean,
-): RpnToken(
+) : RpnToken(
     kind = RpnKind.NUMBER,
 ) {
     fun append(digit: Int): NumberToken {
-        val d = (abs(digit) % 10).toDouble()
-        return when(containsDot) {
+        val d = BigDecimal.valueOf((abs(digit) % 10).toLong())
+        return when (containsDot) {
             false -> {
                 NumberToken(
-                    value = this.value * 10 + d,
+                    value = this.value.multiply(BigDecimal.TEN).add(d),
                     containsDot = false,
                 )
             }
 
             true -> {
-                val decimal = this.value.toString().split(".")[1]
-                val decimalLen = if (decimal == "0") { 0 } else { decimal.length}
+                val decimalLen = getNumberOfDecimalPlaces(this.value)
 
                 NumberToken(
-                    value = this.value + d / 10.0.pow((decimalLen + 1).toDouble()),
+                    value = this.value.add(
+                        d.divide(BigDecimal.TEN.pow(decimalLen + 1)),
+                    ),
                     containsDot = false,
                 )
+            }
+        }
+    }
+
+    private fun getNumberOfDecimalPlaces(value: BigDecimal): Int {
+        val string = value.stripTrailingZeros().toPlainString()
+        val index = string.indexOf(".")
+        return when {
+            index < 0 -> 0
+
+            else -> {
+                string.length - index - 1
             }
         }
     }
@@ -93,9 +106,9 @@ enum class Operator(
         symbol = "-",
     );
 
-    companion object  {
+    companion object {
         fun fromString(symbol: String): Operator {
-            return Operator.values().first() { it.symbol == symbol}
+            return Operator.values().first { it.symbol == symbol }
         }
 
     }
@@ -103,15 +116,17 @@ enum class Operator(
 
 class ReversePolishNotation {
     companion object {
-        fun calculate(expression: String): Double {
-            val tokens = parse(expression)
-            val rpnTokens = toRPN(tokens)
+        fun calculate(expression: String): String {
             Log.d("RPN", "=======================")
+            Log.d("RPN", "[expression] $expression")
+            val tokens = parse(expression)
+            debugOutput(tokens)
+            val rpnTokens = toRPN(tokens)
             debugOutput(rpnTokens)
 
             val rpnStack = Stack<RpnToken>()
             while (rpnTokens.isNotEmpty()) {
-                debugOutput(rpnStack)
+//                debugOutput(rpnStack)
                 val token = rpnTokens.removeAt(0)
                 when (token.kind) {
                     RpnKind.NUMBER -> {
@@ -142,18 +157,19 @@ class ReversePolishNotation {
                     }
                 }
             }
-    //        debugOutput(rpnStack)
+            debugOutput(rpnStack)
             val result = rpnStack.pop()
             if (result.kind != RpnKind.NUMBER) {
                 throw SyntaxError()
             }
-            return (result as NumberToken).value
+            return (result as NumberToken).value.toString()
+                .replace(Regex("\\.0+\\$"), "")
         }
 
         private fun parse(expression: String): ArrayList<RpnToken> {
             val result = ArrayList<RpnToken>()
             var currentNumber = NumberToken(
-                value = 0.0,
+                value = BigDecimal.ZERO,
                 containsDot = false,
             )
             var bracketCnt = 0
@@ -169,7 +185,7 @@ class ReversePolishNotation {
                         result.add(currentNumber)
 
                         currentNumber = NumberToken(
-                            value = 0.0,
+                            value = BigDecimal.ZERO,
                             containsDot = false,
                         )
 
@@ -194,7 +210,10 @@ class ReversePolishNotation {
                     it == '.' -> {
                         currentNumber = currentNumber.setDot()
                     }
-                    else -> {}
+
+                    else -> {
+                        throw RpnError("Unexpected token")
+                    }
 
                 }
             }
@@ -257,21 +276,21 @@ class ReversePolishNotation {
             leftHandValue: NumberToken,
             rightHandValue: NumberToken,
             operator: OperatorToken,
-        ) : NumberToken {
-            val newValue = when(operator.value) {
-                Operator.ADD -> leftHandValue.value + rightHandValue.value
+        ): NumberToken {
+            val newValue = when (operator.value) {
+                Operator.ADD -> leftHandValue.value.add(rightHandValue.value)
 
-                Operator.SUBTRACT -> leftHandValue.value - rightHandValue.value
+                Operator.SUBTRACT -> leftHandValue.value.subtract(rightHandValue.value)
 
                 Operator.DIVIDE -> {
-                    if (rightHandValue.value == 0.0) {
+                    if (rightHandValue.value.compareTo(BigDecimal.TEN) == 0) {
                         throw ZeroDivideError()
                     }
 
-                    leftHandValue.value / rightHandValue.value
+                    leftHandValue.value.divide(rightHandValue.value)
                 }
 
-                Operator.MULTIPLY -> leftHandValue.value * rightHandValue.value
+                Operator.MULTIPLY -> leftHandValue.value.multiply(rightHandValue.value)
 
                 else -> {
                     throw RpnError("Unexpected operation")
@@ -279,7 +298,7 @@ class ReversePolishNotation {
             }
             return NumberToken(
                 value = newValue,
-                containsDot = newValue % 1 != 0.0,
+                containsDot = newValue.remainder(BigDecimal.ONE).compareTo(BigDecimal.TEN) != 0,
             )
         }
 
@@ -292,15 +311,17 @@ class ReversePolishNotation {
                         result as NumberToken
                         buffer.append(result.value)
                     }
+
                     RpnKind.OPERATOR -> {
                         result as OperatorToken
                         buffer.append(result.value.symbol)
                     }
+
                     else -> {
                         throw RpnError("Unexpected token kind")
                     }
                 }
-                buffer.append(result)
+                buffer.append(" ")
             }
             Log.d("RPN", "  -> stack = $buffer")
         }
