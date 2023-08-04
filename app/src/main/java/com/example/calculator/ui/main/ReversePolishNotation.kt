@@ -2,291 +2,307 @@ package com.example.calculator.ui.main
 
 import android.util.Log
 import com.example.calculator.errors.RpnError
+import com.example.calculator.errors.SyntaxError
 import com.example.calculator.errors.ZeroDivideError
-import com.example.calculator.model.ValueKind
-import com.example.calculator.model.ValueModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import java.util.Stack
+import kotlin.math.abs
+import kotlin.math.pow
 
-data class InputToken(
-    val value: ValueModel<*>,
-    val containsDot: Boolean,
+private const val ASC_CODE_0 = 0x30
+
+private sealed class RpnToken(
+    val kind: RpnKind,
 )
 
-private enum class OperatorPriority(val value: Int) {
-    FIRST(1),
-    SECOND(2),
-    THIRD(3),
-    FOURTH(4),
-    FIFTH(5);
+private enum class RpnKind {
+    NUMBER,
+    OPERATOR,
+}
 
-    companion object  {
-        fun fromInt(value: Int) = OperatorPriority.values().first { it.value == value }
+private data class OperatorToken(
+    val value: Operator,
+): RpnToken(
+    kind = RpnKind.OPERATOR,
+)
+
+private data class NumberToken(
+    val value: Double,
+    val containsDot: Boolean,
+): RpnToken(
+    kind = RpnKind.NUMBER,
+) {
+    fun append(digit: Int): NumberToken {
+        val d = (abs(digit) % 10).toDouble()
+        return when(containsDot) {
+            false -> {
+                NumberToken(
+                    value = this.value * 10 + d,
+                    containsDot = false,
+                )
+            }
+
+            true -> {
+                val decimal = this.value.toString().split(".")[1]
+                val decimalLen = if (decimal == "0") { 0 } else { decimal.length}
+
+                NumberToken(
+                    value = this.value + d / 10.0.pow((decimalLen + 1).toDouble()),
+                    containsDot = false,
+                )
+            }
+        }
     }
 
+    fun setDot(): NumberToken {
+        if (this.containsDot) {
+            throw SyntaxError()
+        }
+        return NumberToken(
+            value = this.value,
+            containsDot = true,
+        )
+    }
+}
+
+enum class Operator(
+    val priority: Int,
+    val symbol: String,
+) {
+    LEFT_BRACKET(
+        priority = 1,
+        symbol = "(",
+    ),
+    RIGHT_BRACKET(
+        priority = 1,
+        symbol = ")",
+    ),
+    MULTIPLY(
+        priority = 2,
+        symbol = "*",
+    ),
+    DIVIDE(
+        priority = 2,
+        symbol = "/",
+    ),
+    ADD(
+        priority = 3,
+        symbol = "+",
+    ),
+    SUBTRACT(
+        priority = 3,
+        symbol = "-",
+    );
+
+    companion object  {
+        fun fromString(symbol: String): Operator {
+            return Operator.values().first() { it.symbol == symbol}
+        }
+
+    }
 }
 
 class ReversePolishNotation {
+    companion object {
+        fun calculate(expression: String): Double {
+            val tokens = parse(expression)
+            val rpnTokens = toRPN(tokens)
+            Log.d("RPN", "=======================")
+            debugOutput(rpnTokens)
 
-    private var inputs = ArrayList<ValueModel<*>>()
-
-    val expression = MutableStateFlow("")
-    val result = MutableStateFlow("")
-    private var ansNumber = 0.0
-
-    fun isEmpty() = this.inputs.isEmpty()
-
-    fun removeLast() {
-        if (this.isEmpty()) {
-            return
-        }
-
-        inputs.removeLast()
-    }
-
-    fun clear() {
-        inputs.clear()
-        update()
-    }
-
-    fun update() {
-        if (inputs.isEmpty()) {
-            expression.value = ""
-            result.value = "0"
-            ansNumber = 0.0
-            return
-        }
-        val buffer = StringBuffer()
-        for (input in inputs) {
-            buffer.append(input.value)
-        }
-        expression.value = buffer.toString()
-        try {
-            ansNumber = calculate()
-            result.value = ansNumber.toString()
-        } catch (e: RpnError) {
-            ansNumber = 0.0
-            result.value = "Error"
-        } catch (e: ZeroDivideError) {
-            ansNumber = 0.0
-            result.value = "ZeroDivideError"
-        }
-    }
-
-    private fun calculate(): Double {
-        val tokens = toTokens(inputs)
-        val rpnTokens = toRPN(tokens)
-//        Log.d("RPN", "=======================")
-        debugOutput(rpnTokens)
-
-        val rpnStack = Stack<InputToken>()
-        while (!rpnTokens.isEmpty()) {
-//            debugOutput(rpnStack)
-            val token = rpnTokens.removeAt(0)
-            when (token.value.kind) {
-                ValueKind.NUMBER -> {
-                    rpnStack.push(token)
-                }
-
-                ValueKind.ADD,
-                ValueKind.MULTIPLY,
-                ValueKind.DIVIDE,
-                ValueKind.SUBTRACT -> {
-                    val rightHandValue = rpnStack.pop()
-                    val leftHandValue = rpnStack.pop()
-                    val value = doOperation(
-                        leftHandValue = leftHandValue.value.value as Double,
-                        rightHandValue = rightHandValue.value.value as Double,
-                        operation = token.value.kind,
-                    )
-                    rpnStack.push(
-                        InputToken(
-                            value = ValueModel(
-                                value = value,
-                                kind = ValueKind.NUMBER,
-                            ),
-                            containsDot = (value % 10.0 != 0.0)
-                        )
-                    )
-                }
-
-                else -> {
-                    throw RpnError("Unexpected token")
-                }
-            }
-        }
-//        debugOutput(rpnStack)
-        val result = rpnStack.pop()
-        return result.value.value as Double
-    }
-    private fun debugOutput(results: Stack<InputToken>) {
-
-        val buffer = StringBuffer()
-        for (result in results) {
-            buffer.append(result.value.value.toString())
-        }
-        Log.d("RPN", "  -> stack = " + buffer.toString())
-    }
-    private fun debugOutput(results: ArrayList<InputToken>) {
-
-        val buffer = StringBuffer()
-        for (result in results) {
-            buffer.append(result.value.value.toString())
-        }
-        Log.d("RPN", "----> buffer = " + buffer.toString())
-    }
-
-    private fun doOperation(leftHandValue: Double, rightHandValue: Double, operation: ValueKind) : Double {
-        return when(operation) {
-            ValueKind.ADD -> leftHandValue + rightHandValue
-
-            ValueKind.SUBTRACT -> leftHandValue - rightHandValue
-
-            ValueKind.DIVIDE -> {
-                if (rightHandValue == 0.0) {
-                    throw ZeroDivideError()
-                }
-
-                leftHandValue / rightHandValue
-            }
-
-            ValueKind.MULTIPLY -> leftHandValue * rightHandValue
-
-            else -> {
-                throw RpnError("Unexpected operation")
-            }
-        }
-    }
-
-    private fun toRPN(inputs: ArrayList<InputToken>): ArrayList<InputToken> {
-        val result = ArrayList<InputToken>()
-        val operators = Stack<InputToken>()
-
-        for (token in inputs) {
-            when (token.value.kind) {
-                ValueKind.NUMBER -> {
-                    result.add(token)
-                }
-
-                ValueKind.ADD,
-                ValueKind.SUBTRACT,
-                ValueKind.DIVIDE,
-                ValueKind.MULTIPLY -> {
-                    if (!operators.isEmpty()) {
-                        while (true) {
-                            if ((!operators.isEmpty()) &&
-                                (getOperatorPriority(operators.peek().value) >= getOperatorPriority(token.value))) {
-                                result.add(operators.pop())
-                            } else {
-                                break
-                            }
-                        }
+            val rpnStack = Stack<RpnToken>()
+            while (rpnTokens.isNotEmpty()) {
+                debugOutput(rpnStack)
+                val token = rpnTokens.removeAt(0)
+                when (token.kind) {
+                    RpnKind.NUMBER -> {
+                        rpnStack.push(token)
                     }
-                    operators.push(token)
-                }
 
-                else -> {}
-            }
-        }
+                    RpnKind.OPERATOR -> {
+                        val rightHandValue = rpnStack.pop() as NumberToken
+                        if (rightHandValue.kind != RpnKind.NUMBER) {
+                            throw SyntaxError()
+                        }
+                        val leftHandValue = rpnStack.pop() as NumberToken
+                        if (leftHandValue.kind != RpnKind.NUMBER) {
+                            throw SyntaxError()
+                        }
 
-        while (!operators.isEmpty()) {
-            result.add(operators.pop())
-        }
-
-        return result
-    }
-
-    private fun toTokens(inputs: ArrayList<ValueModel<*>>): ArrayList<InputToken> {
-        val result = ArrayList<InputToken>()
-        var token = 0.0
-
-        for (input in inputs) {
-            when (input.kind) {
-                ValueKind.NUMBER -> {
-                    val num = (input.value as Int).toDouble()
-                    token = token * 10 + num
-                }
-
-
-                ValueKind.ADD,
-                ValueKind.SUBTRACT,
-                ValueKind.DIVIDE,
-                ValueKind.MULTIPLY -> {
-                    result.add(
-                        InputToken(
-                            value = ValueModel(token, ValueKind.NUMBER),
-                            containsDot = (token.mod(10.0) != 0.0),
+                        val newValue = doOperation(
+                            leftHandValue = leftHandValue,
+                            rightHandValue = rightHandValue,
+                            operator = token as OperatorToken,
                         )
-                    )
-                    token = 0.0
-                    result.add(
-                        InputToken(
-                            value = input,
+
+                        rpnStack.push(newValue)
+                    }
+
+                    else -> {
+                        throw RpnError("Unexpected token")
+                    }
+                }
+            }
+    //        debugOutput(rpnStack)
+            val result = rpnStack.pop()
+            if (result.kind != RpnKind.NUMBER) {
+                throw SyntaxError()
+            }
+            return (result as NumberToken).value
+        }
+
+        private fun parse(expression: String): ArrayList<RpnToken> {
+            val result = ArrayList<RpnToken>()
+            var currentNumber = NumberToken(
+                value = 0.0,
+                containsDot = false,
+            )
+            var bracketCnt = 0
+
+            expression.forEach {
+                when {
+                    it.isDigit() -> {
+                        val digit = it.code - ASC_CODE_0
+                        currentNumber = currentNumber.append(digit)
+                    }
+
+                    isOperator(it.toString()) -> {
+                        result.add(currentNumber)
+
+                        currentNumber = NumberToken(
+                            value = 0.0,
                             containsDot = false,
                         )
-                    )
+
+                        result.add(
+                            OperatorToken(
+                                value = Operator.fromString(it.toString())
+                            ),
+                        )
+                    }
+
+                    it == '(' -> {
+                        bracketCnt += 1
+                    }
+
+                    it == ')' -> {
+                        bracketCnt -= 1
+                        if (bracketCnt < 0) {
+                            throw SyntaxError()
+                        }
+                    }
+
+                    it == '.' -> {
+                        currentNumber = currentNumber.setDot()
+                    }
+                    else -> {}
+
+                }
+            }
+            result.add(currentNumber)
+
+            if (bracketCnt != 0) {
+                throw SyntaxError()
+            }
+
+            return result
+        }
+
+        private fun isOperator(target: String): Boolean {
+            return target == Operator.ADD.symbol ||
+                    target == Operator.SUBTRACT.symbol ||
+                    target == Operator.DIVIDE.symbol ||
+                    target == Operator.MULTIPLY.symbol
+        }
+
+        private fun toRPN(inputs: ArrayList<RpnToken>): ArrayList<RpnToken> {
+            val result = ArrayList<RpnToken>()
+            val operators = Stack<OperatorToken>()
+
+            for (token in inputs) {
+                when (token.kind) {
+                    RpnKind.NUMBER -> {
+                        result.add(token)
+                    }
+
+                    RpnKind.OPERATOR -> {
+                        token as OperatorToken
+                        if (operators.isEmpty()) {
+                            operators.push(token)
+                            continue
+                        }
+
+                        while (
+                            operators.isNotEmpty() &&
+                            operators.peek().value.priority >= token.value.priority
+                        ) {
+                            result.add(operators.pop())
+                        }
+                        operators.push(token)
+                    }
+
+                    else -> {
+                        throw RpnError("Unexpected token kind")
+                    }
+                }
+            }
+
+            while (operators.isNotEmpty()) {
+                result.add(operators.pop())
+            }
+
+            return result
+        }
+
+        private fun doOperation(
+            leftHandValue: NumberToken,
+            rightHandValue: NumberToken,
+            operator: OperatorToken,
+        ) : NumberToken {
+            val newValue = when(operator.value) {
+                Operator.ADD -> leftHandValue.value + rightHandValue.value
+
+                Operator.SUBTRACT -> leftHandValue.value - rightHandValue.value
+
+                Operator.DIVIDE -> {
+                    if (rightHandValue.value == 0.0) {
+                        throw ZeroDivideError()
+                    }
+
+                    leftHandValue.value / rightHandValue.value
                 }
 
-                else -> {}
+                Operator.MULTIPLY -> leftHandValue.value * rightHandValue.value
+
+                else -> {
+                    throw RpnError("Unexpected operation")
+                }
             }
-        }
-        result.add(
-            InputToken(
-                value = ValueModel(token, ValueKind.NUMBER),
-                containsDot = (token.mod(10.0) != 0.0),
+            return NumberToken(
+                value = newValue,
+                containsDot = newValue % 1 != 0.0,
             )
-        )
-        return result
-    }
+        }
 
-//    fun append(value: ValueModel<*>) {
-//        when (value.kind) {
-//            ValueKind.NUMBER -> {
-//                inputs.add(value)
-//            }
-//
-//            ValueKind.ADD, ValueKind.SUBTRACT,
-//                ValueKind.DIVIDE, ValueKind.MULTIPLY -> {
-//                    if (isEmpty()) {
-//                        return
-//                    }
-//                    val last = inputs.last()
-//                    if (last.kind != ValueKind.NUMBER) {
-//                        inputs.removeLast()
-//                    }
-//                    inputs.add(value)
-//                }
-//            else -> {}
-//        }
-//
-//    }
+        private fun debugOutput(results: List<RpnToken>) {
 
-    private fun getOperatorPriority(value: ValueModel<*>): Int {
-        return when (value.kind) {
-            ValueKind.MULTIPLY -> 2
-            ValueKind.DIVIDE -> 2
-            ValueKind.SUBTRACT -> 1
-            ValueKind.ADD -> 1
-            else -> {
-                throw RpnError("Unexpected value")
+            val buffer = StringBuffer()
+            for (result in results) {
+                when (result.kind) {
+                    RpnKind.NUMBER -> {
+                        result as NumberToken
+                        buffer.append(result.value)
+                    }
+                    RpnKind.OPERATOR -> {
+                        result as OperatorToken
+                        buffer.append(result.value.symbol)
+                    }
+                    else -> {
+                        throw RpnError("Unexpected token kind")
+                    }
+                }
+                buffer.append(result)
             }
+            Log.d("RPN", "  -> stack = $buffer")
         }
     }
-
-
-    private fun appendNumber(input: InputToken) {
-//        if (input.value.kind != ValueKind.NUMBER) {
-//            throw RpnError("Unexpected value")
-//        }
-//        val last = stack.peek()
-//
-//        // 計算式が0の場合で、0が入力された場合は追加しない
-//        if ((ansNumber == 0) &&
-//            (input.value.value == 0)) {
-//            return
-//        }
-//        stack.push(input)
-    }
-
-
 }

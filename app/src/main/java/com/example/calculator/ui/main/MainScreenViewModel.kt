@@ -1,15 +1,9 @@
 package com.example.calculator.ui.main
 
-import android.app.Activity
-import android.content.Context
 import android.util.Log
-import android.view.KeyEvent
-import android.view.inputmethod.BaseInputConnection
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.calculator.errors.MainScreenError
-import com.example.calculator.model.ValueKind
-import com.example.calculator.model.ValueModel
+import com.example.calculator.errors.CalculatorError
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -34,22 +28,42 @@ class MainScreenViewModel @Inject constructor() : ViewModel(), IMainScreenViewMo
         const val TAG = "MainScreen"
     }
 
-    override var dispatcher: CoroutineDispatcher = Dispatchers.IO
-    private val rpn = ReversePolishNotation()
+    override var dispatcher = Dispatchers.IO
 
-    override val expression: MutableStateFlow<String> = MutableStateFlow("")
+    override val expression = MutableStateFlow("")
+
+    private val internalResult = MutableStateFlow<String>("")
     override val result: StateFlow<String>
-        get() = rpn.result
+        get() = internalResult
 
     override fun calculate() {
         viewModelScope.launch {
-            Log.d(TAG, "---->calculate!")
-
+            processCalculation(
+                expression = expression.value,
+            )
+        }
+    }
+    private suspend fun processCalculation(
+        expression: String,
+    ) = withContext(dispatcher) {
+        try {
+            val result = ReversePolishNotation.calculate(
+                expression = expression
+            )
+            if (result % 1 == 0.0) {
+                internalResult.value = result.toInt().toString()
+            } else {
+                internalResult.value = result.toString()
+            }
+        } catch (e: CalculatorError) {
+            internalResult.value = e.toString()
         }
     }
 
     override fun clear() {
         Log.d(TAG, "---->clear!")
+        expression.value = ""
+        internalResult.value = ""
     }
 
 }

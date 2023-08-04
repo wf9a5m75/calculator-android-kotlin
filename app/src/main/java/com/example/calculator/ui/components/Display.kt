@@ -1,9 +1,7 @@
 package com.example.calculator.ui.components
 
 
-import android.util.Log
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,7 +24,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import com.example.calculator.model.ValueModel
 import com.example.calculator.ui.main.IMainScreenViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -81,12 +78,11 @@ private fun characterFilter(input: String): String {
 @Composable
 fun Display(
     modifier: Modifier = Modifier
-        .fillMaxWidth()
-        .wrapContentHeight(),
+        .fillMaxWidth(),
     viewModel: IMainScreenViewModel,
     formulaFontSize: TextUnit = 30.sp,
     answerFontSize: TextUnit = 30.sp,
-    focusRequester: FocusRequester
+    focusRequester: FocusRequester,
 ) {
 
     val answerTextProp = viewModel.result.collectAsState()
@@ -122,7 +118,7 @@ fun Display(
                                 viewModel.calculate()
                                 true
                             }
-                            Key.Escape -> {
+                            Key.C -> {
                                 viewModel.clear()
                                 true
                             }

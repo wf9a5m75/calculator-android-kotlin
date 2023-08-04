@@ -24,7 +24,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import com.example.calculator.model.ValueModel
 import com.example.calculator.ui.components.Display
 import com.example.calculator.ui.components.NumberPad
 import com.example.calculator.ui.theme.CalculatorTheme
@@ -62,9 +61,7 @@ fun MainScreen(
     val buttonFontSp = (buttonSize * 0.3).sp
 
     val context = LocalContext.current
-    val focusRequester = remember {
-        FocusRequester()
-    }
+    val focusRequester = remember { FocusRequester() }
 
     ConstraintLayout(
         modifier = Modifier
@@ -101,7 +98,6 @@ fun MainScreen(
             buttonSpaceDp = buttonSpaceDp,
             onButtonClick = {
                 simulateKeyPress(context, it.keyCode)
-                //viewModel.onButtonClick(it)
             },
         )
     }

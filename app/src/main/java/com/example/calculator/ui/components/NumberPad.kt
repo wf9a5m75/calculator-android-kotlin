@@ -1,6 +1,5 @@
 package com.example.calculator.ui.components
 
-import android.view.KeyEvent
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,7 +17,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import com.example.calculator.model.KeyEventValue
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -27,7 +25,7 @@ fun NumberPad(
     buttonSizeDp: Dp,
     buttonSpaceDp: Dp,
     buttonFontSp: TextUnit,
-    onButtonClick: (button: KeyEventValue) -> Unit,
+    onButtonClick: (button: NumpadButton) -> Unit,
 ) {
 
     ConstraintLayout(
@@ -46,7 +44,6 @@ fun NumberPad(
             row5,
         ) = createRefs()
 
-
         Row(
             modifier = Modifier
                 .constrainAs(row1) {
@@ -63,32 +60,26 @@ fun NumberPad(
                     .testTag("all_clear")
                 ,
                 fontSize = buttonFontSp,
-                value = KeyEventValue("AC", KeyEvent.KEYCODE_ESCAPE),
-                onClick = {
-                    onButtonClick(it)
-                },
+                value = NumpadButton.ALL_CLEAR,
+                onClick = onButtonClick,
             )
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             OperatorButton(
                 modifier = Modifier
                     .width(buttonSizeDp)
-                    .testTag("parentheses"),
+                    .testTag("left_bracket"),
                 fontSize = buttonFontSp,
-                value = KeyEventValue("(", KeyEvent.KEYCODE_LEFT_BRACKET),
-                onClick = {
-                    onButtonClick(it)
-                },
+                value = NumpadButton.LEFT_BRACKET,
+                onClick = onButtonClick,
             )
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             OperatorButton(
                 modifier = Modifier
                     .width(buttonSizeDp)
-                    .testTag("percent"),
+                    .testTag("right_bracket"),
                 fontSize = buttonFontSp,
-                value = KeyEventValue(")", KeyEvent.KEYCODE_RIGHT_BRACKET),
-                onClick = {
-                    onButtonClick(it)
-                },
+                value = NumpadButton.RIGHT_BRACKET,
+                onClick = onButtonClick,
             )
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             OperatorButton(
@@ -96,10 +87,8 @@ fun NumberPad(
                     .width(buttonSizeDp)
                     .testTag("divides"),
                 fontSize = buttonFontSp,
-                value = KeyEventValue("/", KeyEvent.KEYCODE_SLASH),
-                onClick = {
-                    onButtonClick(it)
-                },
+                value = NumpadButton.DIVIDE,
+                onClick = onButtonClick,
             )
         }
         Row(
@@ -116,10 +105,8 @@ fun NumberPad(
                     .testTag("seven")
                     .width(buttonSizeDp),
                 fontSize = buttonFontSp,
-                value = KeyEventValue("7", KeyEvent.KEYCODE_7),
-                onClick = {
-                    onButtonClick(it)
-                },
+                value = NumpadButton.SEVEN,
+                onClick = onButtonClick,
             )
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             NumberInputButton(
@@ -127,10 +114,8 @@ fun NumberPad(
                     .testTag("eight")
                     .width(buttonSizeDp),
                 fontSize = buttonFontSp,
-                value = KeyEventValue("8", KeyEvent.KEYCODE_8),
-                onClick = {
-                    onButtonClick(it)
-                },
+                value = NumpadButton.EIGHT,
+                onClick = onButtonClick,
             )
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             NumberInputButton(
@@ -138,10 +123,8 @@ fun NumberPad(
                     .testTag("nine")
                     .width(buttonSizeDp),
                 fontSize = buttonFontSp,
-                value = KeyEventValue("9", KeyEvent.KEYCODE_9),
-                onClick = {
-                    onButtonClick(it)
-                },
+                value = NumpadButton.NINE,
+                onClick = onButtonClick,
             )
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             OperatorButton(
@@ -149,10 +132,8 @@ fun NumberPad(
                     .testTag("multiplies")
                     .width(buttonSizeDp),
                 fontSize = buttonFontSp,
-                value = KeyEventValue("*", KeyEvent.KEYCODE_STAR),
-                onClick = {
-                    onButtonClick(it)
-                },
+                value = NumpadButton.MULTIPLY,
+                onClick = onButtonClick,
             )
         }
         Row(
@@ -169,10 +150,8 @@ fun NumberPad(
                     .testTag("four")
                     .width(buttonSizeDp),
                 fontSize = buttonFontSp,
-                value = KeyEventValue("4", KeyEvent.KEYCODE_4),
-                onClick = {
-                    onButtonClick(it)
-                },
+                value = NumpadButton.FOUR,
+                onClick = onButtonClick,
             )
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             NumberInputButton(
@@ -180,10 +159,8 @@ fun NumberPad(
                     .testTag("five")
                     .width(buttonSizeDp),
                 fontSize = buttonFontSp,
-                value = KeyEventValue("5", KeyEvent.KEYCODE_5),
-                onClick = {
-                    onButtonClick(it)
-                },
+                value = NumpadButton.FIVE,
+                onClick = onButtonClick,
             )
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             NumberInputButton(
@@ -191,10 +168,8 @@ fun NumberPad(
                     .testTag("six")
                     .width(buttonSizeDp),
                 fontSize = buttonFontSp,
-                value = KeyEventValue("6", KeyEvent.KEYCODE_6),
-                onClick = {
-                    onButtonClick(it)
-                },
+                value = NumpadButton.SIX,
+                onClick = onButtonClick,
             )
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             OperatorButton(
@@ -202,10 +177,8 @@ fun NumberPad(
                     .testTag("subtracts")
                     .width(buttonSizeDp),
                 fontSize = buttonFontSp,
-                value = KeyEventValue("-", KeyEvent.KEYCODE_MINUS),
-                onClick = {
-                    onButtonClick(it)
-                },
+                value = NumpadButton.SUBTRACT,
+                onClick = onButtonClick,
             )
         }
         Row(
@@ -222,10 +195,8 @@ fun NumberPad(
                     .testTag("one")
                     .width(buttonSizeDp),
                 fontSize = buttonFontSp,
-                value = KeyEventValue("1", KeyEvent.KEYCODE_1),
-                onClick = {
-                    onButtonClick(it)
-                },
+                value = NumpadButton.ONE,
+                onClick = onButtonClick,
             )
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             NumberInputButton(
@@ -233,10 +204,8 @@ fun NumberPad(
                     .testTag("two")
                     .width(buttonSizeDp),
                 fontSize = buttonFontSp,
-                value = KeyEventValue("2", KeyEvent.KEYCODE_2),
-                onClick = {
-                    onButtonClick(it)
-                },
+                value = NumpadButton.TWO,
+                onClick = onButtonClick,
             )
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             NumberInputButton(
@@ -244,10 +213,8 @@ fun NumberPad(
                     .testTag("three")
                     .width(buttonSizeDp),
                 fontSize = buttonFontSp,
-                value = KeyEventValue("3", KeyEvent.KEYCODE_3),
-                onClick = {
-                    onButtonClick(it)
-                },
+                value = NumpadButton.THREE,
+                onClick = onButtonClick,
             )
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             OperatorButton(
@@ -255,10 +222,8 @@ fun NumberPad(
                     .testTag("adds")
                     .width(buttonSizeDp),
                 fontSize = buttonFontSp,
-                value = KeyEventValue("+", KeyEvent.KEYCODE_PLUS),
-                onClick = {
-                    onButtonClick(it)
-                },
+                value = NumpadButton.ADD,
+                onClick = onButtonClick,
             )
         }
 
@@ -275,10 +240,8 @@ fun NumberPad(
                     .testTag("zero")
                     .width(buttonSizeDp),
                 fontSize = buttonFontSp,
-                value = KeyEventValue("0", KeyEvent.KEYCODE_0),
-                onClick = {
-                    onButtonClick(it)
-                },
+                value = NumpadButton.ZERO,
+                onClick = onButtonClick,
             )
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             SpecialInputButton(
@@ -286,10 +249,8 @@ fun NumberPad(
                     .testTag("dot")
                     .width(buttonSizeDp),
                 fontSize = buttonFontSp,
-                value = KeyEventValue(".", KeyEvent.KEYCODE_PERIOD),
-                onClick = {
-                    onButtonClick(it)
-                },
+                value = NumpadButton.DOT,
+                onClick = onButtonClick,
             )
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             SpecialInputButton(
@@ -297,10 +258,8 @@ fun NumberPad(
                 modifier = Modifier
                     .testTag("deletes")
                     .width(buttonSizeDp),
-                value = KeyEventValue("DEL", KeyEvent.KEYCODE_BACK),
-                onClick = {
-                    onButtonClick(it)
-                },
+                value = NumpadButton.DELETE,
+                onClick = onButtonClick,
             )
             Spacer(modifier = Modifier.width(buttonSpaceDp))
             ActionButton(
@@ -308,10 +267,8 @@ fun NumberPad(
                     .testTag("equals")
                     .width(buttonSizeDp),
                 fontSize = buttonFontSp,
-                value = KeyEventValue("=", KeyEvent.KEYCODE_EQUALS),
-                onClick = {
-                    onButtonClick(it)
-                },
+                value = NumpadButton.EQUAL,
+                onClick = onButtonClick,
             )
         }
     }

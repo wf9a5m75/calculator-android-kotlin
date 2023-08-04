@@ -1,5 +1,6 @@
 package com.example.calculator.ui.components
 
+import android.view.KeyEvent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
@@ -13,14 +14,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import com.example.calculator.model.KeyEventValue
-import com.example.calculator.model.ValueModel
+import com.example.calculator.models.NumpadButton
+import com.example.calculator.ui.main.Operator
 
 class CircleButtonColors(
     val background: Color,
     val content: Color,
 )
-
 
 @Composable
 fun <T> CircleButton(
@@ -49,10 +49,10 @@ fun <T> CircleButton(
 
 @Composable
 fun NumberInputButton(
-    value: KeyEventValue,
+    value: NumpadButton,
     fontSize: TextUnit,
     modifier: Modifier = Modifier,
-    onClick: (value: KeyEventValue) -> Unit
+    onClick: (value: NumpadButton) -> Unit
 ) {
     CircleButton(
         modifier = modifier,
@@ -72,10 +72,10 @@ fun NumberInputButton(
 
 @Composable
 fun SpecialInputButton(
-    value: KeyEventValue,
+    value: NumpadButton,
     fontSize: TextUnit,
     modifier: Modifier = Modifier,
-    onClick: (value: KeyEventValue) -> Unit
+    onClick: (value: NumpadButton) -> Unit
 ) {
     CircleButton(
         modifier = modifier,
@@ -95,10 +95,10 @@ fun SpecialInputButton(
 
 @Composable
 fun OperatorButton(
-    value: KeyEventValue,
+    value: NumpadButton,
     fontSize: TextUnit,
     modifier: Modifier = Modifier,
-    onClick: (value: KeyEventValue) -> Unit
+    onClick: (value: NumpadButton) -> Unit
 ) {
     CircleButton(
         modifier = modifier,
@@ -118,10 +118,10 @@ fun OperatorButton(
 
 @Composable
 fun ActionButton(
-    value: KeyEventValue,
+    value: NumpadButton,
     fontSize: TextUnit,
     modifier: Modifier = Modifier,
-    onClick: (value: KeyEventValue) -> Unit
+    onClick: (value: NumpadButton) -> Unit
 ) {
     CircleButton(
         modifier = modifier,
