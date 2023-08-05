@@ -36,6 +36,7 @@ private const val CALC_APP = "com.example.calculator"
 class InstrumentedTestUsingUIAutomator {
 
     private lateinit var device: UiDevice
+    private lateinit var uiSelector: UiSelector
 
     @Before
     fun startMainActivityFromHomeScreen() {
@@ -62,39 +63,52 @@ class InstrumentedTestUsingUIAutomator {
             Until.hasObject(By.pkg(CALC_APP).depth(0)),
             LAUNCH_TIMEOUT,
         )
+        uiSelector = UiSelector()
+    }
+
+    @After
+    fun clear() {
+        findButton(NumpadButton.ALL_CLEAR).click()
+    }
+
+    private fun findButton(button: NumpadButton): UiObject {
+        return device.findObject(uiSelector.resourceId(button.testTag))
+    }
+
+    private fun getText(resourceId: String): String {
+        return device.findObject(uiSelector.resourceId(resourceId)).text
     }
 
     @Test
-    fun testTwoPlusThreeEqualsFive() {
+    fun test_2_plus_3() {
         // Enter an equation: 2 + 3 = ?
-        val uiSelector = UiSelector()
-        device.findObject(uiSelector.resourceId("two")).click()
-        device.findObject(uiSelector.resourceId("adds")).click()
-        device.findObject(uiSelector.resourceId("three")).click()
-//        device.findObject(uiSelector.resourceId("equals")).click()
+        findButton(NumpadButton.TWO).click()
+        findButton(NumpadButton.ADD).click()
+        findButton(NumpadButton.THREE).click()
+        findButton(NumpadButton.EQUAL).click()
 
-        // Verify the result = 5
-        val result = device.findObject(uiSelector.resourceId("answer_display"))
-        assertEquals("5.0", result.text)
+        // Verify the result
+        val result = getText(RESULT_ROW_TEST_TAG)
+        assertEquals("5", result)
+        val equation = getText(EQUATION_ROW_TEST_TAG)
+        assertEquals("2+3", equation)
     }
 
     @Test
-    fun testOnePlusTwoByThree() {
+    fun test_1_plus_2_by_3() {
         // Enter an equation: 1 + 2 * 3 = ?
-        val uiSelector = UiSelector()
-        device.findObject(uiSelector.resourceId("one")).click()
-        device.findObject(uiSelector.resourceId("adds")).click()
-        device.findObject(uiSelector.resourceId("two")).click()
-        device.findObject(uiSelector.resourceId("multiplies")).click()
-        device.findObject(uiSelector.resourceId("three")).click()
-//        device.findObject(uiSelector.resourceId("equals")).click()
+        findButton(NumpadButton.ONE).click()
+        findButton(NumpadButton.ADD).click()
+        findButton(NumpadButton.TWO).click()
+        findButton(NumpadButton.MULTIPLY).click()
+        findButton(NumpadButton.THREE).click()
+        findButton(NumpadButton.EQUAL).click()
 
-        // Verify the result = 7.0
-        val formulaRow = device.findObject(uiSelector.resourceId(EXPRESSION_TEST_TAG))
-        assertEquals("1+2×3", formulaRow.text)
-
-        val answerRow = device.findObject(uiSelector.resourceId(RESULT_TEST_TAG))
-        assertEquals("7.0", answerRow.text)
+        // Verify the result
+        val result = getText(RESULT_ROW_TEST_TAG)
+        assertEquals("7", result)
+        val equation = getText(EQUATION_ROW_TEST_TAG)
+        assertEquals("1+2*3", equation)
     }
 
 }
