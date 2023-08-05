@@ -8,10 +8,10 @@ fun BigDecimal.isInteger() : Boolean {
     return this.stripTrailingZeros().scale() <= 0;
 }
 
-fun rpnCalculate(expression: String): String {
+fun rpnCalculate(equation: String): String {
     println("=======================")
-    println("[expression] $expression")
-    val normalizedInput = rpnNormalize(expression)
+    println("[equation] $equation")
+    val normalizedInput = rpnNormalize(equation)
     println("[normalized] $normalizedInput")
 
     try {

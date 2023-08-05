@@ -1,21 +1,21 @@
 package com.example.rpn
 
 
-internal fun findEndOfNumberIndex(expression: String): Int {
-    if (expression.isEmpty()) {
+internal fun findEndOfNumberIndex(equation: String): Int {
+    if (equation.isEmpty()) {
         return 0
     }
 
     var i = 0
     var containDot = false
-    if (expression[0] == '+' || expression[0] == '-') {
+    if (equation[0] == '+' || equation[0] == '-') {
         i += 1
     }
-    while (i < expression.length) {
+    while (i < equation.length) {
         when {
-            expression[i].isDigit() -> i += 1
+            equation[i].isDigit() -> i += 1
 
-            expression[i] == '.' -> {
+            equation[i] == '.' -> {
                 if (containDot) {
                     throw SyntaxError()
                 }

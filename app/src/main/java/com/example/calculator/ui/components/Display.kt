@@ -11,10 +11,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.platform.LocalTextInputService
-import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -26,8 +26,8 @@ import com.example.rpn.rpnNormalize
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-const val EXPRESSION_TEST_TAG = "expression"
-const val RESULT_TEST_TAG = "result"
+const val EQUATION_ROW_TEST_TAG = "equation_display"
+const val RESULT_ROW_TEST_TAG = "answer_display"
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -37,13 +37,13 @@ fun Display(
     formulaFontSize: TextUnit = 30.sp,
     answerFontSize: TextUnit = 30.sp,
     focusRequester: FocusRequester,
-    answerValue: StateFlow<String>,
-    expressionValue: MutableStateFlow<String>,
+    resultValue: StateFlow<String>,
+    equationValue: MutableStateFlow<String>,
     onKeyEvent: (key: androidx.compose.ui.input.key.KeyEvent) -> Boolean,
 ) {
 
-    val answerTextProp = answerValue.collectAsState()
-    val expressionProp = expressionValue.collectAsState()
+    val answerTextProp = resultValue.collectAsState()
+    val equationProp = equationValue.collectAsState()
 
     ConstraintLayout(
         modifier = modifier
@@ -58,9 +58,9 @@ fun Display(
           LocalTextInputService provides null
         ) {
             BasicTextField(
-                value = expressionProp.value,
+                value = equationProp.value,
                 onValueChange = {
-                    expressionValue.value = rpnNormalize(it, true)
+                    equationValue.value = rpnNormalize(it, true)
                 },
                 modifier = Modifier
                     .focusRequester(focusRequester)
@@ -69,7 +69,10 @@ fun Display(
                         top.linkTo(parent.top)
                         bottom.linkTo(resultDisplay.top)
                     }
-                    .testTag(EXPRESSION_TEST_TAG)
+                    .semantics {
+                        testTag = EQUATION_ROW_TEST_TAG
+                        contentDescription = EQUATION_ROW_TEST_TAG
+                    }
                     .onKeyEvent {
                         return@onKeyEvent onKeyEvent(it)
                     }
@@ -88,7 +91,10 @@ fun Display(
                 .constrainAs(resultDisplay) {
                     bottom.linkTo(parent.bottom)
                 }
-                .testTag(RESULT_TEST_TAG),
+                .semantics {
+                    testTag = RESULT_ROW_TEST_TAG
+                    contentDescription = RESULT_ROW_TEST_TAG
+                },
             fontSize = answerFontSize,
             textAlign = TextAlign.Right,
         )
@@ -102,8 +108,8 @@ fun Display(
 private fun DisplayPreview() {
     Display(
         focusRequester = FocusRequester(),
-        answerValue = MutableStateFlow("1+2"),
-        expressionValue = MutableStateFlow("3"),
+        resultValue = MutableStateFlow("1+2"),
+        equationValue = MutableStateFlow("3"),
         onKeyEvent = { false },
     )
 }

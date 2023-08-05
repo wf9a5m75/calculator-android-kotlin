@@ -8,10 +8,13 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SdkSuppress
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.UiObject
 import androidx.test.uiautomator.UiSelector
 import androidx.test.uiautomator.Until
-import com.example.calculator.ui.components.EXPRESSION_TEST_TAG
-import com.example.calculator.ui.components.RESULT_TEST_TAG
+import com.example.calculator.models.NumpadButton
+import com.example.calculator.ui.components.EQUATION_ROW_TEST_TAG
+import com.example.calculator.ui.components.RESULT_ROW_TEST_TAG
+import org.junit.After
 
 import org.junit.Test
 import org.junit.runner.RunWith

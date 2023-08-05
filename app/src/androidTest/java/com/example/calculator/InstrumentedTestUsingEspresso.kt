@@ -8,8 +8,8 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
-import com.example.calculator.ui.components.EXPRESSION_TEST_TAG
-import com.example.calculator.ui.components.RESULT_TEST_TAG
+import com.example.calculator.ui.components.EQUATION_ROW_TEST_TAG
+import com.example.calculator.ui.components.RESULT_ROW_TEST_TAG
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -31,8 +31,8 @@ class InstrumentedTestUsingEspresso {
         composeTestRule.onNodeWithTag("equals").performClick()
 
         // Verify the result = 0.3333333333333
-        composeTestRule.onNodeWithTag(EXPRESSION_TEST_TAG).assertTextEquals("1/3")
-        composeTestRule.onNodeWithTag(RESULT_TEST_TAG)
+        composeTestRule.onNodeWithTag(EQUATION_ROW_TEST_TAG).assertTextEquals("1/3")
+        composeTestRule.onNodeWithTag(RESULT_ROW_TEST_TAG)
             .assertTextContains("0.333333", substring = true)
     }
 }

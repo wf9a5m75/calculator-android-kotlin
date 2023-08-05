@@ -3,8 +3,6 @@ package com.example.calculator.ui.main
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.rpn.CalculatorError
-import com.example.rpn.rpnCalculate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -16,7 +14,7 @@ import javax.inject.Inject
 
 interface IMainScreenViewModel {
     var dispatcher: CoroutineDispatcher;
-    val expression: MutableStateFlow<String>
+    val equation: MutableStateFlow<String>
     val result: StateFlow<String>
 
     fun calculate()
@@ -31,7 +29,7 @@ class MainScreenViewModel @Inject constructor() : ViewModel(), IMainScreenViewMo
 
     override var dispatcher = Dispatchers.IO
 
-    override val expression = MutableStateFlow("")
+    override val equation = MutableStateFlow("")
 
     private val internalResult = MutableStateFlow<String>("")
     override val result: StateFlow<String>
@@ -40,16 +38,16 @@ class MainScreenViewModel @Inject constructor() : ViewModel(), IMainScreenViewMo
     override fun calculate() {
         viewModelScope.launch {
             processCalculation(
-                expression = expression.value,
+                equation = equation.value,
             )
         }
     }
     private suspend fun processCalculation(
-        expression: String,
+        equation: String,
     ) = withContext(dispatcher) {
         try {
             val result = com.example.rpn.rpnCalculate(
-                expression = expression,
+                equation = equation,
             )
             internalResult.value = result
         } catch (e: com.example.rpn.CalculatorError) {
@@ -59,7 +57,7 @@ class MainScreenViewModel @Inject constructor() : ViewModel(), IMainScreenViewMo
 
     override fun clear() {
         Log.d(TAG, "---->clear!")
-        expression.value = ""
+        equation.value = ""
         internalResult.value = ""
     }
 

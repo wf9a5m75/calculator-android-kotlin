@@ -1,16 +1,16 @@
 package com.example.rpn
 
 
-internal fun findEndOfSubEquationIndex(expression: String): Int {
-    if (!expression.startsWith('(')) {
+internal fun findEndOfSubEquationIndex(equation: String): Int {
+    if (!equation.startsWith('(')) {
         throw RpnError("The given expression must start with '('")
     }
 
     var i = 1
     var leftBracket = 1
     var rightBracket = 0
-    while (i < expression.length) {
-        when(expression[i]) {
+    while (i < equation.length) {
+        when(equation[i]) {
             '(' -> leftBracket += 1
             ')' -> rightBracket += 1
             else -> {}

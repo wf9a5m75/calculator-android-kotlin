@@ -2,19 +2,19 @@ package com.example.rpn
 
 import java.util.Stack
 
-internal fun parseRpnToken(expression: String): List<RpnToken> {
+internal fun parseRpnToken(equation: String): List<RpnToken> {
     val result = Stack<RpnToken>()
 
     var i = 0
-    while (i < expression.length) {
-        val it = expression[i]
+    while (i < equation.length) {
+        val it = equation[i]
 
         when {
             it == '-'  || it.isDigit() -> {
                 // The case for '-(2+3)'
                 if ((it == '-') &&
-                    (i + 1 < expression.length) &&
-                    (!expression[i + 1].isDigit())) {
+                    (i + 1 < equation.length) &&
+                    (!equation[i + 1].isDigit())) {
                     result.push(
                         OperatorToken(
                             value = Operator.SUBTRACT,
@@ -25,11 +25,11 @@ internal fun parseRpnToken(expression: String): List<RpnToken> {
                 }
 
                 // The cases for '-2.34', '2.34', '2', and '2.0'
-                val restOfExpression = expression.substring(i)
+                val restOfEquation = equation.substring(i)
                 val j = findEndOfNumberIndex(
-                    expression = restOfExpression,
+                    equation = restOfEquation,
                 )
-                val newNumber = restOfExpression.substring(0, j).toBigDecimal()
+                val newNumber = restOfEquation.substring(0, j).toBigDecimal()
                 if (result.isNotEmpty() && result.peek().kind == RpnKind.NUMBER) {
                     result.add(
                         OperatorToken(
@@ -57,17 +57,17 @@ internal fun parseRpnToken(expression: String): List<RpnToken> {
             }
 
             it == '(' -> {
-                val restOfExpression = expression.substring(i)
+                val restOfEquation = equation.substring(i)
                 val j = findEndOfSubEquationIndex(
-                    expression = restOfExpression,
+                    equation = restOfEquation,
                 )
-                val subExpression = restOfExpression.substring(0, j)
+                val subEquation = restOfEquation.substring(0, j)
                     .replace(Regex("^\\("), "")
                     .replace(Regex("\\)$"), "")
                 val subResult = rpnCalculate(
-                    expression = subExpression,
+                    equation = subEquation,
                 ).toBigDecimal()
-                println("--->subResult = ${subExpression} => ${subResult}")
+                println("--->subResult = ${subEquation} => ${subResult}")
 
                 if (result.isNotEmpty() && result.peek().kind == RpnKind.NUMBER) {
                     result.add(
@@ -84,7 +84,7 @@ internal fun parseRpnToken(expression: String): List<RpnToken> {
                     )
                 )
 
-                if ((i + j < expression.length) && (!isOperator(expression[i + j].toString()))) {
+                if ((i + j < equation.length) && (!isOperator(equation[i + j].toString()))) {
                     result.push(
                         OperatorToken(
                             value = Operator.MULTIPLY,

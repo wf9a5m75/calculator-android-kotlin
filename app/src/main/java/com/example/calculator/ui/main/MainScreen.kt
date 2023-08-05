@@ -3,8 +3,6 @@ package com.example.calculator.ui.main
 import android.app.Activity
 import android.content.Context
 import android.content.res.Configuration
-import android.util.Log
-import android.view.InputDevice
 import android.view.KeyEvent
 import android.view.inputmethod.BaseInputConnection
 import androidx.activity.compose.BackHandler
@@ -98,10 +96,10 @@ fun MainScreen(
                 bottom.linkTo(numberPad.top, margin = buttonSpaceDp)
             },
             focusRequester = focusRequester,
-            answerValue = viewModel.result,
-            expressionValue = viewModel.expression,
+            resultValue = viewModel.result,
+            equationValue = viewModel.equation,
             onKeyEvent = {
-                backHandlingEnabled = viewModel.expression.value.isNotEmpty()
+                backHandlingEnabled = viewModel.equation.value.isNotEmpty()
 
                 when (it.key) {
                     Key.Enter -> {
@@ -151,7 +149,7 @@ private fun MainScreenPreview() {
         Surface(color = MaterialTheme.colorScheme.background) {
             MainScreen(viewModel = object : IMainScreenViewModel {
                 override var dispatcher: CoroutineDispatcher = Dispatchers.IO
-                override val expression: MutableStateFlow<String>
+                override val equation: MutableStateFlow<String>
                     get() = MutableStateFlow("1+2")
                 override val result: StateFlow<String>
                     get() = MutableStateFlow("3.0")
